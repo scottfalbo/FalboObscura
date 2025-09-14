@@ -1,0 +1,12 @@
+# top-most EditorConfig file
+root = true
+
+[*.{cs,vb}]
+# Insert a file header at the top of the file, replacing any existing file header.
+file_header_template =------------------------------------\nFalbo Obscura\n------------------------------------
+
+# Remove unused using directives
+dotnet_diagnostic.IDE0005.severity = warning
+
+# Warns on the use of the default block namespace
+csharp_style_namespace_declarations = file_scoped:warning

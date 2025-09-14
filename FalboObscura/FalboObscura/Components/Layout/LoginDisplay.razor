@@ -1,0 +1,30 @@
+@using Microsoft.AspNetCore.Identity
+
+<div class="login-display">
+    <AuthorizeView>
+        <Authorized>
+            <span class="me-3">Hello, @context.User.Identity?.Name!</span>
+            <a href="/Identity/Account/Manage" class="me-3">Manage</a>
+            <a href="/Identity/Account/Logout">Logout</a>
+        </Authorized>
+        <NotAuthorized>
+            <a href="/Identity/Account/Register" class="me-3">Register</a>
+            <a href="/Identity/Account/Login">Login</a>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+<style>
+    .login-display {
+        margin-left: auto;
+    }
+    
+    .login-display a {
+        color: inherit;
+        text-decoration: none;
+    }
+    
+    .login-display a:hover {
+        text-decoration: underline;
+    }
+</style>

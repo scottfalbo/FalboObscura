@@ -4,6 +4,6 @@
 
 namespace FalboObscura.Core.Repositories;
 
-public interface IUserRepository
+public interface IPageRepository
 {
 }

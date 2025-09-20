@@ -8,6 +8,7 @@ using FalboObscura.Core.Authentication;
 using FalboObscura.Core.Clients;
 using FalboObscura.Core.Configuration;
 using FalboObscura.Core.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,22 +39,12 @@ builder.Services.AddAuthorizationBuilder()
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
 
-// Register Cosmos Client
 builder.AddCosmosClient(serviceConfig);
-builder.Services.AddSingleton<ICosmosClient, CosmosClient>();
 
-// Register Blob Storage Client
-builder.Services.AddSingleton<BlobServiceClient>(serviceProvider =>
-{
-    if (string.IsNullOrEmpty(serviceConfig.BlobConnectionString))
-        throw new InvalidOperationException("BlobConnectionString configuration is required");
+builder.AddBlobStorageClient(serviceConfig);
 
-    return new BlobServiceClient(serviceConfig.BlobConnectionString);
-});
-builder.Services.AddSingleton<IBlobStorageClient, BlobStorageClient>();
-
-// Register repositories
-builder.Services.AddScoped<IImageRepository, ImageRepository>();
+builder.Services.AddTransient<IImageRepository, ImageRepository>();
+builder.Services.AddTransient<IPageRepository, PageRepository>();
 
 builder.Services.AddHostedService<IdentitySeeder>();
 

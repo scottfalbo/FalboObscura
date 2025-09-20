@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace FalboObscura.Core.Configuration;
 
-public static class ServiceExtension
+public static class ServiceExtensions
 {
     public static void AddBlobStorageClient(this WebApplicationBuilder builder, IServiceConfiguration config)
     {
@@ -49,6 +49,8 @@ public static class ServiceExtension
                 config.CosmosKey,
                 cosmosClientOptions);
         });
+
+        builder.Services.AddSingleton<ICosmosClient, CosmosClient>();
     }
 
     public static void AddIdentity(this WebApplicationBuilder builder)

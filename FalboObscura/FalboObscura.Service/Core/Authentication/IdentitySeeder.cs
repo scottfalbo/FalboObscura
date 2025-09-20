@@ -17,8 +17,8 @@ public class IdentitySeeder(IServiceProvider serviceProvider, IConfiguration con
         var role = "Admin";
         if (!await roleManager.RoleExistsAsync(role)) await roleManager.CreateAsync(new IdentityRole(role));
 
-        var email = configuration["AuthSeed:AdminEmail"];
-        var password = configuration["AuthSeed:AdminPassword"];
+        var email = configuration["AuthSeedAdminEmail"];
+        var password = configuration["AuthSeedPassword"];
 
         if (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrWhiteSpace(password))
         {

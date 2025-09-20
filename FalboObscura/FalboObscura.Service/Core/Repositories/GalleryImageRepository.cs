@@ -6,13 +6,14 @@ using FalboObscura.Core.Clients;
 
 namespace FalboObscura.Core.Repositories;
 
-public class ImageRepository : IImageRepository
+public class GalleryImageRepository : IGalleryImageRepository
 {
     private readonly string _containerName;
     private readonly ICosmosClient _cosmosClient;
     private readonly string _databaseName;
+    private readonly GalleryImageMapper _mapper = new();
 
-    public ImageRepository(ICosmosClient cosmosClient)
+    public GalleryImageRepository(ICosmosClient cosmosClient)
     {
         _cosmosClient = cosmosClient ?? throw new ArgumentNullException(nameof(cosmosClient));
         _databaseName = "FalboObscura";

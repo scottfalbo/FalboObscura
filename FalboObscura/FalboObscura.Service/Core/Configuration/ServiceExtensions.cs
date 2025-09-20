@@ -83,9 +83,10 @@ public static class ServiceExtensions
 
     public static void AddTransients(this WebApplicationBuilder builder)
     {
-        builder.Services.AddTransient<IImageRepository, ImageRepository>();
+        builder.Services.AddTransient<IGalleryImageRepository, GalleryImageRepository>();
         builder.Services.AddTransient<IPageRepository, PageRepository>();
         builder.Services.AddTransient<IGalleryProcessor, GalleryProcessor>();
         builder.Services.AddTransient<IBlobStorageClient, BlobStorageClient>();
+        builder.Services.AddTransient<IBlobStorageProcessor, BlobStorageProcessor>();
     }
 }

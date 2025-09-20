@@ -6,6 +6,8 @@ namespace FalboObscura.Core.Configuration;
 
 public class ServiceConfiguration : IServiceConfiguration
 {
+    public string? AuthSeedAdminEmail { get; set; }
+    public string? AuthSeedPassword { get; set; }
     public string? AzureAdCallbackPath { get; set; }
     public string? AzureAdClientId { get; set; }
     public string? AzureAdInstance { get; set; }

@@ -6,7 +6,7 @@ namespace FalboObscura.Core.Models.Constants;
 
 public class ImageType
 {
-    public const string IllustrationImage = nameof(IllustrationImage);
+    public const string FineArtImage = nameof(FineArtImage);
 
     public const string TattooImage = nameof(TattooImage);
 }

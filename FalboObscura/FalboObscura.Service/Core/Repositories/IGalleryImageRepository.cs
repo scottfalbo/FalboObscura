@@ -8,7 +8,7 @@ namespace FalboObscura.Core.Repositories;
 
 public interface IGalleryImageRepository
 {
-    Task<GalleryImage> CreateGalleryImage(GalleryImage galleryImage);
+    Task CreateGalleryImage(GalleryImage galleryImage);
 
     Task DeleteGalleryImage(Guid id, string partitionKey);
 

@@ -14,25 +14,56 @@ public class GalleryProcessor(
     private readonly IBlobStorageProcessor _blobStorageProcessor = blobStorageProcessor ?? throw new ArgumentNullException(nameof(blobStorageProcessor));
     private readonly IGalleryImageRepository _galleryImageRepository = galleryImageRepository ?? throw new ArgumentNullException(nameof(galleryImageRepository));
 
-    public Task CreateGalleryImage(GalleryImage galleryImage)
+    public async Task CreateGalleryImage(GalleryImage galleryImage)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _galleryImageRepository.CreateGalleryImage(galleryImage);
+        }
+        catch (Exception)
+        {
+            // TODO: implement exception handling
+        }
     }
 
-    public async Task DeleteGalleryImage(Guid id, string imageType)
+    public async Task<bool> DeleteGalleryImage(Guid id, string imageType)
     {
-        await _galleryImageRepository.DeleteGalleryImage(id, imageType);
+        try
+        {
+            await _galleryImageRepository.DeleteGalleryImage(id, imageType);
+            return true;
+        }
+        catch (Exception)
+        {
+            // TODO: implement exception handling
+            return false;
+        }
     }
 
     public async Task<IEnumerable<GalleryImage>> GetGalleryImages(string imageType)
     {
-        var galleryImages = await _galleryImageRepository.GetGalleryImages(imageType);
+        try
+        {
+            var galleryImages = await _galleryImageRepository.GetGalleryImages(imageType);
 
-        return galleryImages;
+            return galleryImages;
+        }
+        catch (Exception)
+        {
+            // TODO: implement exception handling
+            return [];
+        }
     }
 
-    public Task UpdateGalleryImage(GalleryImage galleryImage)
+    public async Task UpdateGalleryImage(GalleryImage galleryImage)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _galleryImageRepository.UpdateGalleryImage(galleryImage);
+        }
+        catch (Exception)
+        {
+            // TODO: implement exception handling
+        }
     }
 }

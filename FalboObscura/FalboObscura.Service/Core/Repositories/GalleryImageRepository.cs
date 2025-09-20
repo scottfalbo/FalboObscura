@@ -16,7 +16,7 @@ public class GalleryImageRepository(ICosmosClient cosmosClient) : IGalleryImageR
     private readonly string _databaseName = "FalboObscura";
     private readonly GalleryImageMapper _mapper = new();
 
-    public async Task<GalleryImage> CreateGalleryImage(GalleryImage galleryImage)
+    public async Task CreateGalleryImage(GalleryImage galleryImage)
     {
         var storageContract = _mapper.DomainModelToStorageContract(galleryImage);
         var partitionKey = new PartitionKey(storageContract.PartitionKey);
@@ -26,8 +26,6 @@ public class GalleryImageRepository(ICosmosClient cosmosClient) : IGalleryImageR
             _databaseName,
             _containerName,
             partitionKey);
-
-        return galleryImage;
     }
 
     public async Task DeleteGalleryImage(Guid id, string partitionKey)

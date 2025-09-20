@@ -49,6 +49,13 @@ public class CosmosClient(Microsoft.Azure.Cosmos.CosmosClient cosmosClient) : IC
         return await container.UpsertItemAsync(item, partitionKey, cancellationToken: cancellationToken);
     }
 
+    public async Task<ItemResponse<T>> DeleteItemAsync<T>(string id, string databaseName, string containerName, PartitionKey partitionKey, CancellationToken cancellationToken = default)
+    {
+        ThrowIfDisposed();
+        var container = GetContainer(databaseName, containerName);
+        return await container.DeleteItemAsync<T>(id, partitionKey, cancellationToken: cancellationToken);
+    }
+
     public void Dispose()
     {
         Dispose(true);

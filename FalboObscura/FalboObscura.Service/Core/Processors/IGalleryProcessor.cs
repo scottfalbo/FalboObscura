@@ -3,13 +3,16 @@
 // ------------------------------------
 
 using FalboObscura.Core.Models;
-using FalboObscura.Core.Models.Constants;
 
 namespace FalboObscura.Core.Processors;
 
 public interface IGalleryProcessor
 {
-    public void CreateGalleryImage();
+    public Task CreateGalleryImage(GalleryImage galleryImage);
 
-    public IEnumerable<GalleryImage> GetGalleryImages(ImageType imageType);
+    public Task DeleteGalleryImage(Guid id);
+
+    public Task<IEnumerable<GalleryImage>> GetGalleryImages(string imageType);
+
+    public Task UpdateGalleryImage(GalleryImage galleryImage);
 }

@@ -3,9 +3,7 @@
 // ------------------------------------
 
 using FalboObscura.Core.Models;
-using FalboObscura.Core.Models.Constants;
 using FalboObscura.Core.Repositories;
-using System.Runtime.Versioning;
 
 namespace FalboObscura.Core.Processors;
 
@@ -16,13 +14,25 @@ public class GalleryProcessor(
     private readonly IBlobStorageProcessor _blobStorageProcessor = blobStorageProcessor ?? throw new ArgumentNullException(nameof(blobStorageProcessor));
     private readonly IGalleryImageRepository _galleryImageRepository = imageRepository ?? throw new ArgumentNullException(nameof(imageRepository));
 
-    public void CreateGalleryImage()
+    public Task CreateGalleryImage(GalleryImage galleryImage)
     {
         throw new NotImplementedException();
     }
 
-    public IEnumerable<GalleryImage> GetGalleryImages(ImageType imageType)
+    public Task DeleteGalleryImage(Guid id)
     {
-        var galleryImage = _galleryImageRepository.Get
+        throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<GalleryImage>> GetGalleryImages(string imageType)
+    {
+        var galleryImages = await _galleryImageRepository.GetGalleryImages(imageType);
+
+        return galleryImages;
+    }
+
+    public Task UpdateGalleryImage(GalleryImage galleryImage)
+    {
+        throw new NotImplementedException();
     }
 }

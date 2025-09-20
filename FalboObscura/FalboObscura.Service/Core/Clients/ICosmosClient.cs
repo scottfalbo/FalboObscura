@@ -15,4 +15,6 @@ public interface ICosmosClient
     Task<IEnumerable<T>> GetItemsByPartitionKeyAsync<T>(string databaseName, string containerName, PartitionKey partitionKey, CancellationToken cancellationToken = default);
 
     Task<ItemResponse<T>> UpsertItemAsync<T>(T item, string databaseName, string containerName, PartitionKey? partitionKey = null, CancellationToken cancellationToken = default);
+
+    Task<ItemResponse<T>> DeleteItemAsync<T>(string id, string databaseName, string containerName, PartitionKey partitionKey, CancellationToken cancellationToken = default);
 }

@@ -3,23 +3,36 @@
 // ------------------------------------
 
 using Azure.Identity;
+using Azure.Storage.Blobs;
 using FalboObscura.Core.Authentication;
+using FalboObscura.Core.Clients;
 using Microsoft.AspNetCore.Identity;
 
 namespace FalboObscura.Core.Configuration;
 
 public static class ServiceExtension
 {
+    public static void AddBlobStorageClient(this WebApplicationBuilder builder, IServiceConfiguration config)
+    {
+        builder.Services.AddSingleton(serviceProvider =>
+        {
+            if (string.IsNullOrEmpty(config.BlobConnectionString))
+                throw new InvalidOperationException("BlobConnectionString configuration is required");
+
+            return new BlobServiceClient(config.BlobConnectionString);
+        });
+
+        builder.Services.AddSingleton<IBlobStorageClient, BlobStorageClient>();
+    }
+
     public static void AddCosmosClient(this WebApplicationBuilder builder, IServiceConfiguration config)
     {
         builder.Services.AddSingleton(serviceProvider =>
         {
-            var configuration = serviceProvider.GetRequiredService<IServiceConfiguration>();
-
-            if (string.IsNullOrEmpty(configuration.CosmosEndPoint))
+            if (string.IsNullOrEmpty(config.CosmosEndPoint))
                 throw new InvalidOperationException("CosmosEndPoint configuration is required");
 
-            if (string.IsNullOrEmpty(configuration.CosmosKey))
+            if (string.IsNullOrEmpty(config.CosmosKey))
                 throw new InvalidOperationException("CosmosKey configuration is required");
 
             var cosmosClientOptions = new Microsoft.Azure.Cosmos.CosmosClientOptions
@@ -32,8 +45,8 @@ public static class ServiceExtension
             };
 
             return new Microsoft.Azure.Cosmos.CosmosClient(
-                configuration.CosmosEndPoint,
-                configuration.CosmosKey,
+                config.CosmosEndPoint,
+                config.CosmosKey,
                 cosmosClientOptions);
         });
     }

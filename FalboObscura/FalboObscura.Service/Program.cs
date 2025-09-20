@@ -2,6 +2,7 @@
 // Falbo Obscura
 // ------------------------------------
 
+using Azure.Storage.Blobs;
 using FalboObscura.Components;
 using FalboObscura.Core.Authentication;
 using FalboObscura.Core.Clients;
@@ -39,8 +40,17 @@ builder.Services.AddRazorPages();
 
 // Register Cosmos Client
 builder.AddCosmosClient(serviceConfig);
-
 builder.Services.AddSingleton<ICosmosClient, CosmosClient>();
+
+// Register Blob Storage Client
+builder.Services.AddSingleton<BlobServiceClient>(serviceProvider =>
+{
+    if (string.IsNullOrEmpty(serviceConfig.BlobConnectionString))
+        throw new InvalidOperationException("BlobConnectionString configuration is required");
+
+    return new BlobServiceClient(serviceConfig.BlobConnectionString);
+});
+builder.Services.AddSingleton<IBlobStorageClient, BlobStorageClient>();
 
 // Register repositories
 builder.Services.AddScoped<IImageRepository, ImageRepository>();

@@ -11,9 +11,17 @@ namespace FalboObscura.Core;
 [Mapper]
 public partial class GalleryImageMapper
 {
-    [MapProperty(nameof(GalleryImage.ImageType), nameof(GalleryImageStorageContract.PartitionKey))]
-    public partial GalleryImageStorageContract DomainModelToStorageContract(GalleryImage galleryImage);
+    public GalleryImageStorageContract DomainModelToStorageContract(GalleryImage galleryImage)
+    {
+        var galleryImageStorageContract = MapToStorageContract(galleryImage);
+        galleryImageStorageContract.PartitionKey = galleryImage.ImageType;
 
-    [MapperIgnoreSource(nameof(GalleryImageStorageContract.PartitionKey))] // Ignore PartitionKey when mapping back
+        return galleryImageStorageContract;
+    }
+
+    [MapperIgnoreSource(nameof(GalleryImageStorageContract.PartitionKey))]
     public partial GalleryImage StorageContractToDomainModel(GalleryImageStorageContract storageContract);
+
+    [MapProperty(nameof(GalleryImage.ImageType), nameof(GalleryImageStorageContract.PartitionKey))]
+    private partial GalleryImageStorageContract MapToStorageContract(GalleryImage galleryImage);
 }

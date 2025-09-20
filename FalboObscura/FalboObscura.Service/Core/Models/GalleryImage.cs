@@ -2,8 +2,6 @@
 // Falbo Obscura
 // ------------------------------------
 
-using FalboObscura.Core.Models.Constants;
-
 namespace FalboObscura.Core.Models;
 
 public class GalleryImage
@@ -16,7 +14,7 @@ public class GalleryImage
 
     public string ImageThumbnailUrl { get; set; } = default!;
 
-    public ImageType ImageType { get; set; } = default!;
+    public string ImageType { get; set; } = default!;
 
     public string ImageUrl { get; set; } = default!;
 

@@ -2,7 +2,6 @@
 // Falbo Obscura
 // ------------------------------------
 
-using FalboObscura.Core.Models.Constants;
 using System.Text.Json.Serialization;
 
 namespace FalboObscura.Core.Models.StorageContracts;
@@ -18,7 +17,7 @@ public class GalleryImageStorageContract
 
     public string ImageThumbnailUrl { get; set; } = default!;
 
-    public ImageType ImageType { get; set; } = default!;
+    public string ImageType { get; set; } = default!;
 
     public string ImageUrl { get; set; } = default!;
 

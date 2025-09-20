@@ -2,22 +2,28 @@
 // Falbo Obscura
 // ------------------------------------
 
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using FalboObscura.Components;
 using FalboObscura.Core.Authentication;
+using FalboObscura.Core.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Key Vault
-var keyVaultUri = builder.Configuration["KeyVault:VaultUri"];
+var keyVaultUri = builder.Configuration["KeyVaultUri"];
+
 if (!string.IsNullOrEmpty(keyVaultUri))
 {
     var credential = new DefaultAzureCredential();
     builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
 }
+
+builder.Services.Configure<ServiceConfiguration>(builder.Configuration);
+builder.Services.AddSingleton<IServiceConfiguration>(serviceProvider =>
+    serviceProvider.GetRequiredService<IOptions<ServiceConfiguration>>().Value);
 
 var connectionString = builder.Configuration.GetConnectionString("Default") ?? "Data Source=obscura.db";
 builder.Services.AddDbContext<ObscuraDbContext>(options => options.UseSqlite(connectionString));

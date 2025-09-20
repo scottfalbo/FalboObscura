@@ -5,6 +5,33 @@
 
 <p>@ImageType</p>
 
-<button type="button" class="btn btn-primary" @onclick="HandleButtonClick">
+<div class="gallery-images">
+    @if (GalleryImages != null && GalleryImages.Any())
+    {
+        @foreach (var image in GalleryImages)
+        {
+            <div class="gallery-item">
+                <p>Image ID: @image.Id</p>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No images found for type: @ImageType</p>
+    }
+</div>
+
+<button type="button" class="btn btn-primary" @onclick="CreateGalleryImage">
     Test Button
 </button>
+
+<div class="delete-form mt-3">
+    <h5>Delete Gallery Image</h5>
+    <EditForm Model="DeleteImageId" OnValidSubmit="HandleDeleteSubmit">
+        <div class="mb-3">
+            <label for="imageId" class="form-label">Image ID (GUID):</label>
+            <InputText id="imageId" class="form-control" @bind-Value="DeleteImageId" placeholder="Enter image GUID" />
+        </div>
+        <button type="submit" class="btn btn-danger">Delete Image</button>
+    </EditForm>
+</div>

@@ -15,13 +15,19 @@ public partial class GalleryViewer : ComponentBase
 
     [Parameter] public string ImageType { get; set; } = string.Empty;
 
+    public IEnumerable<GalleryImage> GalleryImages { get; set; } = [];
+
+    private string DeleteImageId = string.Empty;
+
     protected override async Task OnInitializedAsync()
     {
-        // TODO: Implement image querying logic based on ImageType
-        await Task.CompletedTask;
+        if (GalleryProcessor != null && !string.IsNullOrEmpty(ImageType))
+        {
+            GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+        }
     }
 
-    private async Task HandleButtonClick()
+    private async Task CreateGalleryImage()
     {
         // TODO: Implement your logic here
         var galleryImage = new GalleryImage()
@@ -34,5 +40,32 @@ public partial class GalleryViewer : ComponentBase
         };
 
         await GalleryProcessor!.CreateGalleryImage(galleryImage);
+        
+        if (GalleryProcessor != null && !string.IsNullOrEmpty(ImageType))
+        {
+            GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleDeleteSubmit()
+    {
+        if (GalleryProcessor != null && !string.IsNullOrEmpty(DeleteImageId) && Guid.TryParse(DeleteImageId, out var imageId))
+        {
+            var success = await GalleryProcessor.DeleteGalleryImage(imageId, ImageType);
+            
+            if (success)
+            {
+                // Clear the input field
+                DeleteImageId = string.Empty;
+                
+                // Refresh the gallery images after deletion
+                if (!string.IsNullOrEmpty(ImageType))
+                {
+                    GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+                    StateHasChanged();
+                }
+            }
+        }
     }
 }

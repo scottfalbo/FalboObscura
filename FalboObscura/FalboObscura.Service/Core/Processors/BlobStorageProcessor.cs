@@ -8,4 +8,5 @@ namespace FalboObscura.Core.Processors;
 
 public class BlobStorageProcessor(IBlobStorageClient client) : IBlobStorageProcessor
 {
+    private readonly IBlobStorageClient _client = client;
 }

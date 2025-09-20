@@ -1,5 +1,10 @@
-﻿@using FalboObscura.Core.Models.Constants
+﻿@rendermode InteractiveServer
+@using FalboObscura.Core.Models.Constants
 
 <h3>GalleryViewer</h3>
 
 <p>@ImageType</p>
+
+<button type="button" class="btn btn-primary" @onclick="HandleButtonClick">
+    Test Button
+</button>

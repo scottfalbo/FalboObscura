@@ -11,7 +11,7 @@ namespace FalboObscura.Core.Repositories;
 
 public class GalleryImageRepository(ICosmosClient cosmosClient) : IGalleryImageRepository
 {
-    private readonly string _containerName = "Images";
+    private readonly string _containerName = "GalleryImage";
     private readonly ICosmosClient _cosmosClient = cosmosClient ?? throw new ArgumentNullException(nameof(cosmosClient));
     private readonly string _databaseName = "FalboObscura";
     private readonly GalleryImageMapper _mapper = new();

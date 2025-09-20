@@ -20,8 +20,9 @@ public class GalleryProcessor(
         {
             await _galleryImageRepository.CreateGalleryImage(galleryImage);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Console.WriteLine(ex);
             // TODO: implement exception handling
         }
     }

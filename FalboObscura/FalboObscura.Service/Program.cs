@@ -2,13 +2,9 @@
 // Falbo Obscura
 // ------------------------------------
 
-using Azure.Storage.Blobs;
 using FalboObscura.Components;
 using FalboObscura.Core.Authentication;
-using FalboObscura.Core.Clients;
 using FalboObscura.Core.Configuration;
-using FalboObscura.Core.Repositories;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,8 +39,7 @@ builder.AddCosmosClient(serviceConfig);
 
 builder.AddBlobStorageClient(serviceConfig);
 
-builder.Services.AddTransient<IImageRepository, ImageRepository>();
-builder.Services.AddTransient<IPageRepository, PageRepository>();
+builder.AddTransients();
 
 builder.Services.AddHostedService<IdentitySeeder>();
 

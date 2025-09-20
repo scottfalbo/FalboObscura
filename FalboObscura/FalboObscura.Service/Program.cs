@@ -5,7 +5,9 @@
 using Azure.Identity;
 using FalboObscura.Components;
 using FalboObscura.Core.Authentication;
+using FalboObscura.Core.Clients;
 using FalboObscura.Core.Configuration;
+using FalboObscura.Core.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -52,6 +54,37 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
+
+// Register Cosmos Client
+builder.Services.AddSingleton<Microsoft.Azure.Cosmos.CosmosClient>(serviceProvider =>
+{
+    var configuration = serviceProvider.GetRequiredService<IServiceConfiguration>();
+
+    if (string.IsNullOrEmpty(configuration.CosmosEndPoint))
+        throw new InvalidOperationException("CosmosEndPoint configuration is required");
+
+    if (string.IsNullOrEmpty(configuration.CosmosKey))
+        throw new InvalidOperationException("CosmosKey configuration is required");
+
+    var cosmosClientOptions = new Microsoft.Azure.Cosmos.CosmosClientOptions
+    {
+        SerializerOptions = new Microsoft.Azure.Cosmos.CosmosSerializationOptions
+        {
+            PropertyNamingPolicy = Microsoft.Azure.Cosmos.CosmosPropertyNamingPolicy.CamelCase
+        },
+        ConnectionMode = Microsoft.Azure.Cosmos.ConnectionMode.Direct
+    };
+
+    return new Microsoft.Azure.Cosmos.CosmosClient(
+        configuration.CosmosEndPoint,
+        configuration.CosmosKey,
+        cosmosClientOptions);
+});
+
+builder.Services.AddSingleton<ICosmosClient, CosmosClient>();
+
+// Register repositories
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 
 builder.Services.AddHostedService<IdentitySeeder>();
 

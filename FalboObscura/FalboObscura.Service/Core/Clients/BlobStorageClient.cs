@@ -26,12 +26,6 @@ public class BlobStorageClient(BlobServiceClient blobServiceClient) : IBlobStora
         return blobClient.Uri.ToString();
     }
 
-    public async Task<string> UploadBlobAsync(string containerName, string blobName, byte[] content, string? contentType = null, CancellationToken cancellationToken = default)
-    {
-        using var stream = new MemoryStream(content);
-        return await UploadBlobAsync(containerName, blobName, stream, contentType, cancellationToken);
-    }
-
     public async Task<bool> DeleteBlobAsync(string containerName, string blobName, CancellationToken cancellationToken = default)
     {
         var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);

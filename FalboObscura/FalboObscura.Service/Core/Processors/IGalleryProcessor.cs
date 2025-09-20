@@ -10,7 +10,7 @@ public interface IGalleryProcessor
 {
     public Task CreateGalleryImage(GalleryImage galleryImage);
 
-    public Task DeleteGalleryImage(Guid id);
+    public Task DeleteGalleryImage(Guid id, string imageType);
 
     public Task<IEnumerable<GalleryImage>> GetGalleryImages(string imageType);
 

@@ -16,6 +16,38 @@ public class GalleryImageRepository(ICosmosClient cosmosClient) : IGalleryImageR
     private readonly string _databaseName = "FalboObscura";
     private readonly GalleryImageMapper _mapper = new();
 
+    public async Task<GalleryImage> CreateGalleryImage(GalleryImage galleryImage)
+    {
+        var storageContract = _mapper.DomainModelToStorageContract(galleryImage);
+        var partitionKey = new PartitionKey(storageContract.PartitionKey);
+
+        await _cosmosClient.UpsertItemAsync(
+            storageContract,
+            _databaseName,
+            _containerName,
+            partitionKey);
+
+        return galleryImage;
+    }
+
+    public async Task DeleteGalleryImage(Guid id, string partitionKey)
+    {
+        try
+        {
+            var partitionKeyValue = new PartitionKey(partitionKey);
+
+            await _cosmosClient.DeleteItemAsync<GalleryImageStorageContract>(
+                id.ToString(),
+                _databaseName,
+                _containerName,
+                partitionKeyValue);
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            // do nothing
+        }
+    }
+
     public async Task<IEnumerable<GalleryImage>> GetGalleryImages(string partitionKey)
     {
         var partitionKeyValue = new PartitionKey(partitionKey);
@@ -30,21 +62,7 @@ public class GalleryImageRepository(ICosmosClient cosmosClient) : IGalleryImageR
         return galleryImages;
     }
 
-    public async Task<GalleryImage> Create(GalleryImage galleryImage)
-    {
-        var storageContract = _mapper.DomainModelToStorageContract(galleryImage);
-        var partitionKey = new PartitionKey(storageContract.PartitionKey);
-
-        await _cosmosClient.UpsertItemAsync(
-            storageContract,
-            _databaseName,
-            _containerName,
-            partitionKey);
-
-        return galleryImage;
-    }
-
-    public async Task<GalleryImage> Update(GalleryImage galleryImage)
+    public async Task<GalleryImage> UpdateGalleryImage(GalleryImage galleryImage)
     {
         var storageContract = _mapper.DomainModelToStorageContract(galleryImage);
         var partitionKey = new PartitionKey(storageContract.PartitionKey);

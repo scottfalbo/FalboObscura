@@ -8,20 +8,20 @@ using FalboObscura.Core.Repositories;
 namespace FalboObscura.Core.Processors;
 
 public class GalleryProcessor(
-    IGalleryImageRepository imageRepository,
+    IGalleryImageRepository galleryImageRepository,
     IBlobStorageProcessor blobStorageProcessor) : IGalleryProcessor
 {
     private readonly IBlobStorageProcessor _blobStorageProcessor = blobStorageProcessor ?? throw new ArgumentNullException(nameof(blobStorageProcessor));
-    private readonly IGalleryImageRepository _galleryImageRepository = imageRepository ?? throw new ArgumentNullException(nameof(imageRepository));
+    private readonly IGalleryImageRepository _galleryImageRepository = galleryImageRepository ?? throw new ArgumentNullException(nameof(galleryImageRepository));
 
     public Task CreateGalleryImage(GalleryImage galleryImage)
     {
         throw new NotImplementedException();
     }
 
-    public Task DeleteGalleryImage(Guid id)
+    public async Task DeleteGalleryImage(Guid id, string imageType)
     {
-        throw new NotImplementedException();
+        await _galleryImageRepository.DeleteGalleryImage(id, imageType);
     }
 
     public async Task<IEnumerable<GalleryImage>> GetGalleryImages(string imageType)

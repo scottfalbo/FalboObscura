@@ -2,45 +2,27 @@
 // Falbo Obscura
 // ------------------------------------
 
-using Azure.Identity;
 using FalboObscura.Components;
 using FalboObscura.Core.Authentication;
 using FalboObscura.Core.Clients;
 using FalboObscura.Core.Configuration;
 using FalboObscura.Core.Repositories;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Key Vault
-var keyVaultUri = builder.Configuration["KeyVaultUri"];
-
-if (!string.IsNullOrEmpty(keyVaultUri))
-{
-    var credential = new DefaultAzureCredential();
-    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
-}
+builder.AddKeyVault();
 
 builder.Services.Configure<ServiceConfiguration>(builder.Configuration);
-builder.Services.AddSingleton<IServiceConfiguration>(serviceProvider =>
-    serviceProvider.GetRequiredService<IOptions<ServiceConfiguration>>().Value);
+var serviceConfig = new ServiceConfiguration();
+
+builder.Configuration.Bind(serviceConfig);
+builder.Services.AddSingleton<IServiceConfiguration>(serviceConfig);
 
 var connectionString = builder.Configuration.GetConnectionString("Default") ?? "Data Source=obscura.db";
 builder.Services.AddDbContext<ObscuraDbContext>(options => options.UseSqlite(connectionString));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = false;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequiredLength = 6;
-})
-.AddEntityFrameworkStores<ObscuraDbContext>()
-.AddDefaultTokenProviders()
-.AddDefaultUI();
+builder.AddIdentity();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -56,30 +38,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
 
 // Register Cosmos Client
-builder.Services.AddSingleton<Microsoft.Azure.Cosmos.CosmosClient>(serviceProvider =>
-{
-    var configuration = serviceProvider.GetRequiredService<IServiceConfiguration>();
-
-    if (string.IsNullOrEmpty(configuration.CosmosEndPoint))
-        throw new InvalidOperationException("CosmosEndPoint configuration is required");
-
-    if (string.IsNullOrEmpty(configuration.CosmosKey))
-        throw new InvalidOperationException("CosmosKey configuration is required");
-
-    var cosmosClientOptions = new Microsoft.Azure.Cosmos.CosmosClientOptions
-    {
-        SerializerOptions = new Microsoft.Azure.Cosmos.CosmosSerializationOptions
-        {
-            PropertyNamingPolicy = Microsoft.Azure.Cosmos.CosmosPropertyNamingPolicy.CamelCase
-        },
-        ConnectionMode = Microsoft.Azure.Cosmos.ConnectionMode.Direct
-    };
-
-    return new Microsoft.Azure.Cosmos.CosmosClient(
-        configuration.CosmosEndPoint,
-        configuration.CosmosKey,
-        cosmosClientOptions);
-});
+builder.AddCosmosClient(serviceConfig);
 
 builder.Services.AddSingleton<ICosmosClient, CosmosClient>();
 

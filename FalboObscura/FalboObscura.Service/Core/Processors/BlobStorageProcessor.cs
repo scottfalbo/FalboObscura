@@ -13,11 +13,7 @@ namespace FalboObscura.Core.Processors;
 public class BlobStorageProcessor(IBlobStorageClient client) : IBlobStorageProcessor
 {
     private const string ContainerName = "falbo-obscura";
-    private const int MaxDisplayHeight = 1080;
-    private const int MaxDisplayWidth = 1920;
     private const long MaxFileSize = 10 * 1024 * 1024; //10mb
-    private const int ThumbnailHeight = 300;
-    private const int ThumbnailWidth = 400;
 
     private readonly IBlobStorageClient _client = client;
 
@@ -29,11 +25,11 @@ public class BlobStorageProcessor(IBlobStorageClient client) : IBlobStorageProce
         var thumbnailFilename = $"{baseFilename}-thumbnail";
 
         using var displayStream = image.OpenReadStream(MaxFileSize);
-        using var displayImageStream = await ResizeImageAsync(displayStream, MaxDisplayWidth, MaxDisplayHeight, 85);
+        using var displayImageStream = await ResizeImageAsync(displayStream, 1920, 1080, 85);
         var displayBlobUrl = await _client.UploadBlobAsync(ContainerName, baseFilename, displayImageStream, "image/jpeg");
 
         using var thumbnailSourceStream = image.OpenReadStream(MaxFileSize);
-        using var thumbnailStream = await ResizeImageAsync(thumbnailSourceStream, ThumbnailWidth, ThumbnailHeight, 75);
+        using var thumbnailStream = await ResizeImageAsync(thumbnailSourceStream, 400, 300, 75);
         await _client.UploadBlobAsync(ContainerName, thumbnailFilename, thumbnailStream, "image/jpeg");
 
         return displayBlobUrl;

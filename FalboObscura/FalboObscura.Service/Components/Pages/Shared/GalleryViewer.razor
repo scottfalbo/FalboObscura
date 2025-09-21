@@ -34,65 +34,71 @@
     }
 </div>
 
-<div class="image-upload-form mt-4">
-    <h5>Add New Image</h5>
-    <EditForm Model="UploadModel" OnValidSubmit="CreateGalleryImage">
-        <DataAnnotationsValidator />
-        <ValidationSummary class="text-danger" />
+<AuthorizeView>
+    <Authorized Context="authContext">
+        <div class="admin-controls mt-4">
+            <div class="image-upload-form">
+                <h5>Add New Image</h5>
+                <EditForm Model="UploadModel" OnValidSubmit="CreateGalleryImage">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" />
 
-        <fieldset disabled="@IsUploading">
-            <div class="mb-3">
-                <label for="imageFile" class="form-label">Image File *</label>
-                <InputFile id="imageFile" class="form-control" accept="image/*"
-                          OnChange="HandleFileSelected" multiple="false" disabled="@IsUploading" />
-                <ValidationMessage For="@(() => UploadModel.ImageFile)" class="text-danger" />
+                    <fieldset disabled="@IsUploading">
+                        <div class="mb-3">
+                            <label for="imageFile" class="form-label">Image File *</label>
+                            <InputFile id="imageFile" class="form-control" accept="image/*"
+                                      OnChange="HandleFileSelected" multiple="false" disabled="@IsUploading" />
+                            <ValidationMessage For="@(() => UploadModel.ImageFile)" class="text-danger" />
+                        </div>
+
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title (Optional)</label>
+                        <InputText id="title" class="form-control" @bind-Value="UploadModel.Title"
+                                  placeholder="Enter image title" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="altText" class="form-label">Alt Text *</label>
+                        <InputText id="altText" class="form-control" @bind-Value="UploadModel.AltText"
+                                  placeholder="Describe the image for accessibility" />
+                        <ValidationMessage For="@(() => UploadModel.AltText)" class="text-danger" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description (Optional)</label>
+                        <InputTextArea id="description" class="form-control" @bind-Value="UploadModel.Description"
+                                      rows="3" placeholder="Enter image description" />
+                        <ValidationMessage For="@(() => UploadModel.Description)" class="text-danger" />
+                    </div>
+                    </fieldset>
+
+                    <button type="submit" class="btn btn-success" disabled="@IsUploading">
+                        @if (IsUploading)
+                        {
+                            <span class="spinner-border spinner-border-sm" role="status"></span>
+                            <span>Uploading...</span>
+                        }
+                        else
+                        {
+                            <span>Upload Image</span>
+                        }
+                    </button>
+                </EditForm>
             </div>
 
-        <div class="mb-3">
-            <label for="title" class="form-label">Title (Optional)</label>
-            <InputText id="title" class="form-control" @bind-Value="UploadModel.Title"
-                      placeholder="Enter image title" />
+            <div class="delete-form mt-3">
+                <h5>Delete Gallery Image</h5>
+                <EditForm Model="DeleteImageId" OnValidSubmit="HandleDeleteSubmit">
+                    <div class="mb-3">
+                        <label for="imageId" class="form-label">Image ID (GUID):</label>
+                        <InputText id="imageId" class="form-control" @bind-Value="DeleteImageId" placeholder="Enter image GUID" />
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete Image</button>
+                </EditForm>
+            </div>
         </div>
-
-        <div class="mb-3">
-            <label for="altText" class="form-label">Alt Text *</label>
-            <InputText id="altText" class="form-control" @bind-Value="UploadModel.AltText"
-                      placeholder="Describe the image for accessibility" />
-            <ValidationMessage For="@(() => UploadModel.AltText)" class="text-danger" />
-        </div>
-
-        <div class="mb-3">
-            <label for="description" class="form-label">Description (Optional)</label>
-            <InputTextArea id="description" class="form-control" @bind-Value="UploadModel.Description"
-                          rows="3" placeholder="Enter image description" />
-            <ValidationMessage For="@(() => UploadModel.Description)" class="text-danger" />
-        </div>
-        </fieldset>
-
-        <button type="submit" class="btn btn-success" disabled="@IsUploading">
-            @if (IsUploading)
-            {
-                <span class="spinner-border spinner-border-sm" role="status"></span>
-                <span>Uploading...</span>
-            }
-            else
-            {
-                <span>Upload Image</span>
-            }
-        </button>
-    </EditForm>
-</div>
-
-<div class="delete-form mt-3">
-    <h5>Delete Gallery Image</h5>
-    <EditForm Model="DeleteImageId" OnValidSubmit="HandleDeleteSubmit">
-        <div class="mb-3">
-            <label for="imageId" class="form-label">Image ID (GUID):</label>
-            <InputText id="imageId" class="form-control" @bind-Value="DeleteImageId" placeholder="Enter image GUID" />
-        </div>
-        <button type="submit" class="btn btn-danger">Delete Image</button>
-    </EditForm>
-</div>
+    </Authorized>
+</AuthorizeView>
 
 <style>
     .loading-overlay {

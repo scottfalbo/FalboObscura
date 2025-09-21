@@ -1,4 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using FalboObscura.Core.Services
+@using FalboObscura.Core.Models
+@inherits LayoutComponentBase
+@inject IThemeService ThemeService
+@implements IDisposable
 
 <div class="page">
     <div class="sidebar">
@@ -7,7 +11,10 @@
 
     <main>
         <div class="top-row px-4 d-flex justify-content-between align-items-center">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            <div class="d-flex align-items-center gap-3">
+                <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+                <ThemeSelector />
+            </div>
             <LoginDisplay />
         </div>
 
@@ -22,3 +29,25 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ThemeService.InitializeAsync();
+            ThemeService.ThemeChanged += OnThemeChanged;
+        }
+    }
+
+    private void OnThemeChanged(object? sender, Theme theme)
+    {
+        // Theme changes are handled via JavaScript DOM manipulation
+        // No need to trigger StateHasChanged since we're not changing Blazor state
+    }
+
+    public void Dispose()
+    {
+        ThemeService.ThemeChanged -= OnThemeChanged;
+    }
+}

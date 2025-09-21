@@ -1,0 +1,44 @@
+@using FalboObscura.Core.Services
+@using FalboObscura.Core.Models
+@inject IThemeService ThemeService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+@rendermode InteractiveServer
+
+<div class="theme-selector">
+    <select @onchange="OnThemeChanged" value="@currentTheme" class="form-select form-select-sm">
+        @foreach (var theme in ThemeService.AvailableThemes)
+        {
+            <option value="@theme.Name">@theme.DisplayName</option>
+        }
+    </select>
+</div>
+
+@code {
+    private string currentTheme = "dark";
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentTheme = await ThemeService.GetThemeAsync();
+        ThemeService.ThemeChanged += OnThemeServiceChanged;
+    }
+
+    private async Task OnThemeChanged(ChangeEventArgs e)
+    {
+        if (e.Value?.ToString() is string themeName)
+        {
+            await ThemeService.SetThemeAsync(themeName);
+        }
+    }
+
+    private void OnThemeServiceChanged(object? sender, Theme theme)
+    {
+        currentTheme = theme.Name;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ThemeService.ThemeChanged -= OnThemeServiceChanged;
+    }
+}

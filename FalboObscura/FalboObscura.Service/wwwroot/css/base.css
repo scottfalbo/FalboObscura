@@ -1,4 +1,63 @@
+@import url('./themes.css');
+
+
+
+/* Base styles using CSS custom properties */
+body {
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 main {
-    background-color: #000000;
-    color: #aaaaaa;
+    background-color: var(--primary-bg);
+    color: var(--secondary-text);
+}
+
+.sidebar {
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
+}
+
+.top-row {
+    background-color: var(--navbar-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.content {
+    background-color: var(--secondary-bg);
+}
+
+/* Form elements */
+input, select, textarea {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--primary-text);
+}
+
+/* Cards and containers */
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--primary-text);
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+/* Links */
+a {
+    color: var(--accent-color);
+}
+
+a:hover {
+    color: var(--accent-hover);
 }

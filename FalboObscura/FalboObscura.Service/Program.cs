@@ -5,6 +5,7 @@
 using FalboObscura.Components;
 using FalboObscura.Core.Authentication;
 using FalboObscura.Core.Configuration;
+using FalboObscura.Core.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,9 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddRazorPages();
+
+// Register theme service as scoped (required for IJSRuntime dependency)
+builder.Services.AddScoped<IThemeService, ThemeService>();
 
 // Configure file upload limits
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>

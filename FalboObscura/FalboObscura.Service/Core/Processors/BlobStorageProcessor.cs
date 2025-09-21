@@ -17,6 +17,15 @@ public class BlobStorageProcessor(IBlobStorageClient client) : IBlobStorageProce
 
     private readonly IBlobStorageClient _client = client;
 
+    public async Task DeleteImage(Guid id, string imageType)
+    {
+        var blobName = $"{imageType}-{id}";
+        var thumbnailBlobName = $"{blobName}-thumbnail";
+
+        await _client.DeleteBlobAsync(ContainerName, blobName);
+        await _client.DeleteBlobAsync(ContainerName, thumbnailBlobName);
+    }
+
     public async Task<string> StoreImage(ImageUpload imageUpload)
     {
         var image = imageUpload.ImageFile ?? throw new ArgumentException("ImageFile cannot be null", nameof(imageUpload));

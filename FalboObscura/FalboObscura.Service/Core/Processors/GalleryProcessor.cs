@@ -50,6 +50,7 @@ public class GalleryProcessor(
         try
         {
             await _galleryImageRepository.DeleteGalleryImage(id, imageType);
+            await _blobStorageProcessor.DeleteImage(id, imageType);
             return true;
         }
         catch (Exception)

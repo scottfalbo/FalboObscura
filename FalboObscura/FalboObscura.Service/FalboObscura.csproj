@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.14.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="Riok.Mapperly" Version="4.2.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
   </ItemGroup>
 
 </Project>

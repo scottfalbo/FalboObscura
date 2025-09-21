@@ -14,16 +14,34 @@ public class GalleryProcessor(
     private readonly IBlobStorageProcessor _blobStorageProcessor = blobStorageProcessor ?? throw new ArgumentNullException(nameof(blobStorageProcessor));
     private readonly IGalleryImageRepository _galleryImageRepository = galleryImageRepository ?? throw new ArgumentNullException(nameof(galleryImageRepository));
 
-    public async Task CreateGalleryImage(GalleryImage galleryImage)
+    public async Task<GalleryImage> CreateGalleryImage(ImageUpload imageUpload)
     {
         try
         {
+            var galleryImage = new GalleryImage()
+            {
+                AltText = imageUpload.AltText,
+                Description = imageUpload.Description,
+                ImageType = imageUpload.ImageType,
+                Title = imageUpload.Title,
+            };
+
+            imageUpload.Id = galleryImage.Id;
+
+            var blobUrl = await _blobStorageProcessor.StoreImage(imageUpload);
+
+            galleryImage.ImageUrl = blobUrl;
+            galleryImage.ImageThumbnailUrl = blobUrl;
+
             await _galleryImageRepository.CreateGalleryImage(galleryImage);
+
+            return galleryImage;
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
             // TODO: implement exception handling
+            throw new Exception("womp womp", ex);
         }
     }
 

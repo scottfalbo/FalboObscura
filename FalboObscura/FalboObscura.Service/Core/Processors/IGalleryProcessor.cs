@@ -8,7 +8,7 @@ namespace FalboObscura.Core.Processors;
 
 public interface IGalleryProcessor
 {
-    public Task CreateGalleryImage(GalleryImage galleryImage);
+    public Task<GalleryImage> CreateGalleryImage(ImageUpload imageUpload);
 
     public Task<bool> DeleteGalleryImage(Guid id, string imageType);
 

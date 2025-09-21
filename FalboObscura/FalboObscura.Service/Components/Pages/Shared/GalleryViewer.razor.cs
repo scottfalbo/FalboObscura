@@ -42,7 +42,17 @@ public partial class GalleryViewer : ComponentBase
 
         try
         {
-            await Task.CompletedTask;
+            UploadModel.ImageType = ImageType;
+            await GalleryProcessor.CreateGalleryImage(UploadModel);
+            
+            // Refresh the gallery after successful upload
+            if (!string.IsNullOrEmpty(ImageType))
+            {
+                GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+            }
+            
+            // Reset the upload form
+            UploadModel = new ImageUpload();
         }
         catch (Exception ex)
         {
@@ -79,7 +89,17 @@ public partial class GalleryViewer : ComponentBase
 
     private void HandleFileSelected(InputFileChangeEventArgs e)
     {
-        UploadModel.ImageFile = e.File;
+        const long maxFileSize = 10 * 1024 * 1024; // 10 MB
+        
+        var file = e.File;
+        if (file.Size > maxFileSize)
+        {
+            // TODO: Show error message to user
+            Console.WriteLine($"File too large: {file.Size} bytes. Max allowed: {maxFileSize} bytes");
+            return;
+        }
+        
+        UploadModel.ImageFile = file;
         StateHasChanged();
     }
 }

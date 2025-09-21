@@ -1,6 +1,19 @@
 ﻿@rendermode InteractiveServer
 @using FalboObscura.Core.Models.Constants
 
+<!-- Loading Overlay -->
+@if (IsUploading)
+{
+    <div class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Uploading image...</p>
+        </div>
+    </div>
+}
+
 <h3>GalleryViewer</h3>
 
 <p>@ImageType</p>
@@ -12,6 +25,7 @@
         {
             <div class="gallery-item">
                 <p>Image ID: @image.Id</p>
+                <p>@image.ImageUrl</p>
             </div>
         }
     }
@@ -27,12 +41,13 @@
         <DataAnnotationsValidator />
         <ValidationSummary class="text-danger" />
 
-        <div class="mb-3">
-            <label for="imageFile" class="form-label">Image File *</label>
-            <InputFile id="imageFile" class="form-control" accept="image/*" 
-                      OnChange="HandleFileSelected" />
-            <ValidationMessage For="@(() => UploadModel.ImageFile)" class="text-danger" />
-        </div>
+        <fieldset disabled="@IsUploading">
+            <div class="mb-3">
+                <label for="imageFile" class="form-label">Image File *</label>
+                <InputFile id="imageFile" class="form-control" accept="image/*" 
+                          OnChange="HandleFileSelected" multiple="false" disabled="@IsUploading" />
+                <ValidationMessage For="@(() => UploadModel.ImageFile)" class="text-danger" />
+            </div>
 
         <div class="mb-3">
             <label for="title" class="form-label">Title (Optional)</label>
@@ -53,6 +68,7 @@
                           rows="3" placeholder="Enter image description" />
             <ValidationMessage For="@(() => UploadModel.Description)" class="text-danger" />
         </div>
+        </fieldset>
 
         <button type="submit" class="btn btn-success" disabled="@IsUploading">
             @if (IsUploading)
@@ -78,3 +94,33 @@
         <button type="submit" class="btn btn-danger">Delete Image</button>
     </EditForm>
 </div>
+
+<style>
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .loading-content {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .gallery-item {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+    }
+</style>

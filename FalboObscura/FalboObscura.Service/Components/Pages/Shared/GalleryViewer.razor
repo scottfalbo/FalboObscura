@@ -1,7 +1,5 @@
 ﻿@rendermode InteractiveServer
 @using FalboObscura.Core.Models.Constants
-@inject IJSRuntime JSRuntime
-@inject AuthenticationStateProvider AuthStateProvider
 
 <!-- Loading Overlay -->
 @if (IsUploading)
@@ -102,16 +100,7 @@
             </div>
         </div>
     </Authorized>
-    <NotAuthorized>
-        <div class="alert alert-info">
-            <p>You need to be authenticated to upload images.</p>
-        </div>
-    </NotAuthorized>
-    <Authorizing>
-        <div class="alert alert-secondary">
-            <p>Checking authentication...</p>
-        </div>
-    </Authorizing>
+
     </AuthorizeView>
 </CascadingAuthenticationState>
 

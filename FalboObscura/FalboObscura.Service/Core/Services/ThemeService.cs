@@ -3,17 +3,6 @@ using Microsoft.JSInterop;
 
 namespace FalboObscura.Core.Services;
 
-public interface IThemeService
-{
-    Theme CurrentTheme { get; }
-    IEnumerable<Theme> AvailableThemes { get; }
-    Task SetThemeAsync(string themeName);
-    Task<string> GetThemeAsync();
-    string GetThemeCssClass();
-    Task InitializeAsync();
-    event EventHandler<Theme>? ThemeChanged;
-}
-
 public class ThemeService : IThemeService
 {
     private Theme _currentTheme;
@@ -27,7 +16,7 @@ public class ThemeService : IThemeService
 
     public ThemeService(IJSRuntime jsRuntime)
     {
-        _jsRuntime = jsRuntime;
+        _jsRuntime = jsRuntime ?? throw new ArgumentNullException(nameof(jsRuntime));
         
         // Initialize with available themes - easily expandable
         _availableThemes = new List<Theme>

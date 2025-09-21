@@ -40,31 +40,20 @@ public partial class GalleryViewer : ComponentBase
 
     private async Task CreateGalleryImage()
     {
-        if (GalleryProcessor == null || UploadModel.ImageFile == null)
-            return;
+        if (GalleryProcessor == null || UploadModel.ImageFile == null) return;
 
         IsUploading = true;
         StateHasChanged();
 
-        try
-        {
-            UploadModel.ImageType = ImageType;
-            await GalleryProcessor.CreateGalleryImage(UploadModel);
+        UploadModel.ImageType = ImageType;
+        await GalleryProcessor.CreateGalleryImage(UploadModel);
 
-            GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+        GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
 
-            UploadModel = new ImageUpload();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            // TODO: Show user-friendly error message
-        }
-        finally
-        {
-            IsUploading = false;
-            StateHasChanged();
-        }
+        UploadModel = new ImageUpload();
+
+        IsUploading = false;
+        StateHasChanged();
     }
 
     private async Task HandleDeleteSubmit()

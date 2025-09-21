@@ -15,7 +15,7 @@ public class BlobStorageProcessor(IBlobStorageClient client) : IBlobStorageProce
     private const string ContainerName = "falbo-obscura";
     private const long MaxFileSize = 10 * 1024 * 1024; //10mb
 
-    private readonly IBlobStorageClient _client = client;
+    private readonly IBlobStorageClient _client = client ?? throw new ArgumentNullException(nameof(client));
 
     public async Task DeleteImage(Guid id, string imageType)
     {

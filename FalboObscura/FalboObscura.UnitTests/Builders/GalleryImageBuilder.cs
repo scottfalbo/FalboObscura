@@ -62,4 +62,10 @@ internal class GalleryImageBuilder
         _title = title;
         return this;
     }
+
+    public GalleryImageBuilder WithImageType(string imageType)
+    {
+        _imageType = imageType;
+        return this;
+    }
 }

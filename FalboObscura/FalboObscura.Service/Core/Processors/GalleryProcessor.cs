@@ -31,7 +31,7 @@ public class GalleryProcessor(
             var blobUrl = await _blobStorageProcessor.StoreImage(imageUpload);
 
             galleryImage.ImageUrl = blobUrl;
-            galleryImage.ImageThumbnailUrl = blobUrl;
+            galleryImage.ImageThumbnailUrl = $"{blobUrl}-thumbnail";
 
             await _galleryImageRepository.CreateGalleryImage(galleryImage);
 

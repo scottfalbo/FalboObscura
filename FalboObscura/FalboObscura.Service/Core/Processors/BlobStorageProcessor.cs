@@ -28,26 +28,22 @@ public class BlobStorageProcessor(IBlobStorageClient client) : IBlobStorageProce
         var baseFilename = $"{imageUpload.ImageType}-{imageUpload.Id}";
         var thumbnailFilename = $"{baseFilename}-thumbnail";
 
-        using var originalStream = image.OpenReadStream(MaxFileSize);
-
-        using var displayImageStream = ResizeImage(originalStream, MaxDisplayWidth, MaxDisplayHeight, 85);
+        using var displayStream = image.OpenReadStream(MaxFileSize);
+        using var displayImageStream = await ResizeImageAsync(displayStream, MaxDisplayWidth, MaxDisplayHeight, 85);
         var displayBlobUrl = await _client.UploadBlobAsync(ContainerName, baseFilename, displayImageStream, "image/jpeg");
 
-        originalStream.Position = 0;
-
-        using var thumbnailStream = ResizeImage(originalStream, ThumbnailWidth, ThumbnailHeight, 75);
+        using var thumbnailSourceStream = image.OpenReadStream(MaxFileSize);
+        using var thumbnailStream = await ResizeImageAsync(thumbnailSourceStream, ThumbnailWidth, ThumbnailHeight, 75);
         await _client.UploadBlobAsync(ContainerName, thumbnailFilename, thumbnailStream, "image/jpeg");
 
         return displayBlobUrl;
     }
 
-    private static MemoryStream ResizeImage(Stream inputStream, int maxWidth, int maxHeight, int quality = 85)
+    private static async Task<MemoryStream> ResizeImageAsync(Stream inputStream, int maxWidth, int maxHeight, int quality = 85)
     {
         var outputStream = new MemoryStream();
 
-        using var image = Image.Load(inputStream);
-
-        // Calculate new dimensions while preserving aspect ratio
+        using var image = await Image.LoadAsync(inputStream);
         var ratioX = (double)maxWidth / image.Width;
         var ratioY = (double)maxHeight / image.Height;
         var ratio = Math.Min(ratioX, ratioY);
@@ -55,10 +51,8 @@ public class BlobStorageProcessor(IBlobStorageClient client) : IBlobStorageProce
         var newWidth = (int)(image.Width * ratio);
         var newHeight = (int)(image.Height * ratio);
 
-        // Resize the image
         image.Mutate(x => x.Resize(newWidth, newHeight));
 
-        // Save as JPEG with specified quality
         var encoder = new JpegEncoder { Quality = quality };
         image.Save(outputStream, encoder);
 

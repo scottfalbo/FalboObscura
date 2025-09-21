@@ -44,14 +44,9 @@ public partial class GalleryViewer : ComponentBase
         {
             UploadModel.ImageType = ImageType;
             await GalleryProcessor.CreateGalleryImage(UploadModel);
-            
-            // Refresh the gallery after successful upload
-            if (!string.IsNullOrEmpty(ImageType))
-            {
-                GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
-            }
-            
-            // Reset the upload form
+
+            GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+
             UploadModel = new ImageUpload();
         }
         catch (Exception ex)
@@ -74,15 +69,10 @@ public partial class GalleryViewer : ComponentBase
 
             if (success)
             {
-                // Clear the input field
                 DeleteImageId = string.Empty;
 
-                // Refresh the gallery images after deletion
-                if (!string.IsNullOrEmpty(ImageType))
-                {
-                    GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
-                    StateHasChanged();
-                }
+                GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+                StateHasChanged();
             }
         }
     }
@@ -90,7 +80,7 @@ public partial class GalleryViewer : ComponentBase
     private void HandleFileSelected(InputFileChangeEventArgs e)
     {
         const long maxFileSize = 10 * 1024 * 1024; // 10 MB
-        
+
         var file = e.File;
         if (file.Size > maxFileSize)
         {
@@ -98,7 +88,7 @@ public partial class GalleryViewer : ComponentBase
             Console.WriteLine($"File too large: {file.Size} bytes. Max allowed: {maxFileSize} bytes");
             return;
         }
-        
+
         UploadModel.ImageFile = file;
         StateHasChanged();
     }

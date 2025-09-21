@@ -24,8 +24,7 @@
         @foreach (var image in GalleryImages)
         {
             <div class="gallery-item">
-                <p>Image ID: @image.Id</p>
-                <p>@image.ImageUrl</p>
+                <img src="@image.ImageUrl" alt="@image.AltText" />
             </div>
         }
     }
@@ -44,27 +43,27 @@
         <fieldset disabled="@IsUploading">
             <div class="mb-3">
                 <label for="imageFile" class="form-label">Image File *</label>
-                <InputFile id="imageFile" class="form-control" accept="image/*" 
+                <InputFile id="imageFile" class="form-control" accept="image/*"
                           OnChange="HandleFileSelected" multiple="false" disabled="@IsUploading" />
                 <ValidationMessage For="@(() => UploadModel.ImageFile)" class="text-danger" />
             </div>
 
         <div class="mb-3">
             <label for="title" class="form-label">Title (Optional)</label>
-            <InputText id="title" class="form-control" @bind-Value="UploadModel.Title" 
+            <InputText id="title" class="form-control" @bind-Value="UploadModel.Title"
                       placeholder="Enter image title" />
         </div>
 
         <div class="mb-3">
             <label for="altText" class="form-label">Alt Text *</label>
-            <InputText id="altText" class="form-control" @bind-Value="UploadModel.AltText" 
+            <InputText id="altText" class="form-control" @bind-Value="UploadModel.AltText"
                       placeholder="Describe the image for accessibility" />
             <ValidationMessage For="@(() => UploadModel.AltText)" class="text-danger" />
         </div>
 
         <div class="mb-3">
             <label for="description" class="form-label">Description (Optional)</label>
-            <InputTextArea id="description" class="form-control" @bind-Value="UploadModel.Description" 
+            <InputTextArea id="description" class="form-control" @bind-Value="UploadModel.Description"
                           rows="3" placeholder="Enter image description" />
             <ValidationMessage For="@(() => UploadModel.Description)" class="text-danger" />
         </div>

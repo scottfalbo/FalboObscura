@@ -21,7 +21,6 @@ public class GalleryImageStorageContract
 
     public string ImageUrl { get; set; } = default!;
 
-    // Ensure the partition key property name matches your Cosmos container configuration
     [JsonPropertyName("partitionKey")]
     public string PartitionKey { get; set; } = default!;
 

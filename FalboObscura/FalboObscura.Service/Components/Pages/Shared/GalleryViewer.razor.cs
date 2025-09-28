@@ -14,15 +14,17 @@ public partial class GalleryViewer : ComponentBase
     private string DeleteImageId = string.Empty;
 
     private bool hasRendered = false;
+
     public IEnumerable<GalleryImage> GalleryImages { get; set; } = [];
 
     [Inject]
     public IGalleryProcessor? GalleryProcessor { get; set; }
 
-    [Parameter] public string ImageType { get; set; } = string.Empty;
+    [Parameter]
+    public string ImageType { get; set; } = string.Empty;
+
     private bool IsUploading { get; set; } = false;
 
-    // Image upload properties
     private ImageUpload UploadModel { get; set; } = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

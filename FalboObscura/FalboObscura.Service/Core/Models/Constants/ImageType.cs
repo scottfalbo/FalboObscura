@@ -4,7 +4,7 @@
 
 namespace FalboObscura.Core.Models.Constants;
 
-public class ImageType
+public static class ImageType
 {
     public const string DrawingImage = nameof(DrawingImage);
 

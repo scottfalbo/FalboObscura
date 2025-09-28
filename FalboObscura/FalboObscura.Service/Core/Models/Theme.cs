@@ -2,11 +2,6 @@ namespace FalboObscura.Core.Models;
 
 public class Theme
 {
-    public string Name { get; set; } = string.Empty;
-    public string DisplayName { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public string CssClass { get; set; } = string.Empty;
-
     public static Theme Dark => new()
     {
         Name = "dark",
@@ -22,4 +17,9 @@ public class Theme
         Description = "Clean light theme",
         CssClass = "theme-light"
     };
+
+    public string CssClass { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 }

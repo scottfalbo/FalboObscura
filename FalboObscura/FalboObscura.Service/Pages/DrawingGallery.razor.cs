@@ -4,7 +4,7 @@
 
 using Microsoft.AspNetCore.Components;
 
-namespace FalboObscura.Components.Pages;
+namespace FalboObscura.Pages;
 
 public partial class DrawingGallery : ComponentBase
 {

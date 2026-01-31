@@ -20,14 +20,16 @@ public sealed class GalleryProcessorTests
 
     private GalleryProcessor _galleryProcessor = default!;
     private IBlobStorageProcessor _mockBlobStorageProcessor = default!;
+    private IGalleryRepository _mockGalleryRepository = default!;
     private IGalleryImageRepository _mockGalleryImageRepository = default!;
 
     [TestInitialize]
     public void TestInitialize()
     {
+        _mockGalleryRepository = Substitute.For<IGalleryRepository>();
         _mockGalleryImageRepository = Substitute.For<IGalleryImageRepository>();
         _mockBlobStorageProcessor = Substitute.For<IBlobStorageProcessor>();
-        _galleryProcessor = new GalleryProcessor(_mockGalleryImageRepository, _mockBlobStorageProcessor);
+        _galleryProcessor = new GalleryProcessor(_mockGalleryRepository, _mockGalleryImageRepository, _mockBlobStorageProcessor);
     }
 
     #region Constructor Tests
@@ -37,7 +39,7 @@ public sealed class GalleryProcessorTests
     {
         // Act & Assert
         Assert.ThrowsException<ArgumentNullException>(() =>
-            new GalleryProcessor(_mockGalleryImageRepository, null!));
+            new GalleryProcessor(_mockGalleryRepository, _mockGalleryImageRepository, null!));
     }
 
     [TestMethod]
@@ -45,14 +47,14 @@ public sealed class GalleryProcessorTests
     {
         // Act & Assert
         Assert.ThrowsException<ArgumentNullException>(() =>
-            new GalleryProcessor(null!, _mockBlobStorageProcessor));
+            new GalleryProcessor(_mockGalleryRepository, null!, _mockBlobStorageProcessor));
     }
 
     [TestMethod]
     public void Constructor_WithValidDependencies_CreatesInstance()
     {
         // Act
-        var processor = new GalleryProcessor(_mockGalleryImageRepository, _mockBlobStorageProcessor);
+        var processor = new GalleryProcessor(_mockGalleryRepository, _mockGalleryImageRepository, _mockBlobStorageProcessor);
 
         // Assert
         Assert.IsNotNull(processor);

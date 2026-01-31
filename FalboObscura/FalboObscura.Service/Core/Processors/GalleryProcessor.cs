@@ -8,11 +8,68 @@ using FalboObscura.Core.Repositories;
 namespace FalboObscura.Core.Processors;
 
 public class GalleryProcessor(
+    IGalleryRepository galleryRepository,
     IGalleryImageRepository galleryImageRepository,
     IBlobStorageProcessor blobStorageProcessor) : IGalleryProcessor
 {
     private readonly IBlobStorageProcessor _blobStorageProcessor = blobStorageProcessor ?? throw new ArgumentNullException(nameof(blobStorageProcessor));
     private readonly IGalleryImageRepository _galleryImageRepository = galleryImageRepository ?? throw new ArgumentNullException(nameof(galleryImageRepository));
+    private readonly IGalleryRepository _galleryRepository = galleryRepository ?? throw new ArgumentNullException(nameof(galleryRepository));
+
+    public async Task<Gallery> CreateGallery(Gallery gallery)
+    {
+        try
+        {
+            await _galleryRepository.CreateGallery(gallery);
+            return gallery;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            // TODO: implement exception handling
+            throw new Exception("Failed to create gallery", ex);
+        }
+    }
+
+    public async Task<bool> DeleteGallery(Guid id)
+    {
+        try
+        {
+            await _galleryRepository.DeleteGallery(id, "Gallery");
+            return true;
+        }
+        catch (Exception)
+        {
+            // TODO: implement exception handling
+            return false;
+        }
+    }
+
+    public async Task<IEnumerable<Gallery>> GetGalleries()
+    {
+        try
+        {
+            var galleries = await _galleryRepository.GetGalleries("Gallery");
+            return galleries;
+        }
+        catch (Exception)
+        {
+            // TODO: implement exception handling
+            return [];
+        }
+    }
+
+    public async Task UpdateGallery(Gallery gallery)
+    {
+        try
+        {
+            await _galleryRepository.UpdateGallery(gallery);
+        }
+        catch (Exception)
+        {
+            // TODO: implement exception handling
+        }
+    }
 
     public async Task<GalleryImage> CreateGalleryImage(ImageUpload imageUpload)
     {

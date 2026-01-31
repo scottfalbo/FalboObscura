@@ -12,7 +12,7 @@ public interface IGalleryProcessor
 
     public Task<bool> DeleteGallery(Guid id);
 
-    public Task<IEnumerable<Gallery>> GetGalleries();
+    public Task<Gallery?> GetGallery(Guid id);
 
     public Task UpdateGallery(Gallery gallery);
 
@@ -20,7 +20,7 @@ public interface IGalleryProcessor
 
     public Task<bool> DeleteGalleryImage(Guid id, string imageType);
 
-    public Task<IEnumerable<GalleryImage>> GetGalleryImages(string imageType);
+    public Task<GalleryImage?> GetGalleryImage(Guid id, string imageType);
 
     public Task UpdateGalleryImage(GalleryImage galleryImage);
 }

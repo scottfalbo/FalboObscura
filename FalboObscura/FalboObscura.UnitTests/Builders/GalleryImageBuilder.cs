@@ -14,7 +14,7 @@ internal class GalleryImageBuilder
     private string? _description;
     private Guid _id = Guid.NewGuid();
     private string _imageThumbnailUrl = "test-thumb-url";
-    private string _imageType = ImageType.TattooImage;
+    private string _imageType = GalleryType.TattooGallery;
     private string _imageUrl = "test-url";
     private string? _title;
 

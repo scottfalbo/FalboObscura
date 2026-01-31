@@ -45,17 +45,17 @@ public class GalleryProcessor(
         }
     }
 
-    public async Task<IEnumerable<Gallery>> GetGalleries()
+    public async Task<Gallery?> GetGallery(Guid id)
     {
         try
         {
-            var galleries = await _galleryRepository.GetGalleries("Gallery");
-            return galleries;
+            var gallery = await _galleryRepository.GetGallery(id, "Gallery");
+            return gallery;
         }
         catch (Exception)
         {
             // TODO: implement exception handling
-            return [];
+            return null;
         }
     }
 
@@ -117,18 +117,17 @@ public class GalleryProcessor(
         }
     }
 
-    public async Task<IEnumerable<GalleryImage>> GetGalleryImages(string imageType)
+    public async Task<GalleryImage?> GetGalleryImage(Guid id, string imageType)
     {
         try
         {
-            var galleryImages = await _galleryImageRepository.GetGalleryImages(imageType);
-
-            return galleryImages;
+            var galleryImage = await _galleryImageRepository.GetGalleryImage(id, imageType);
+            return galleryImage;
         }
         catch (Exception)
         {
             // TODO: implement exception handling
-            return [];
+            return null;
         }
     }
 

@@ -46,18 +46,24 @@ public class GalleryImageRepository(ICosmosClient cosmosClient) : IGalleryImageR
         }
     }
 
-    public async Task<IEnumerable<GalleryImage>> GetGalleryImages(string partitionKey)
+    public async Task<GalleryImage?> GetGalleryImage(Guid id, string partitionKey)
     {
-        var partitionKeyValue = new PartitionKey(partitionKey);
+        try
+        {
+            var partitionKeyValue = new PartitionKey(partitionKey);
 
-        var storageContracts = await _cosmosClient.GetItemsByPartitionKeyAsync<GalleryImageStorageContract>(
-            _databaseName,
-            _containerName,
-            partitionKeyValue);
+            var storageContract = await _cosmosClient.GetItemAsync<GalleryImageStorageContract>(
+                id.ToString(),
+                _databaseName,
+                _containerName,
+                partitionKeyValue);
 
-        var galleryImages = storageContracts.Select(_mapper.StorageContractToDomainModel);
-
-        return galleryImages;
+            return _mapper.StorageContractToDomainModel(storageContract);
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
     }
 
     public async Task<GalleryImage> UpdateGalleryImage(GalleryImage galleryImage)

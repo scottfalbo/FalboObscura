@@ -12,7 +12,7 @@ public interface IGalleryImageRepository
 
     Task DeleteGalleryImage(Guid id, string partitionKey);
 
-    Task<IEnumerable<GalleryImage>> GetGalleryImages(string partitionKey);
+    Task<GalleryImage?> GetGalleryImage(Guid id, string partitionKey);
 
     Task<GalleryImage> UpdateGalleryImage(GalleryImage galleryImage);
 }

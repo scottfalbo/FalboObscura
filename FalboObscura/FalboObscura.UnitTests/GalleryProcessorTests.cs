@@ -116,7 +116,7 @@ public sealed class GalleryProcessorTests
         // Arrange
         var imageUpload = _imageUploadBuilder
             .WithAltText("Test Alt Text")
-            .WithImageType(ImageType.DrawingImage)
+            .WithImageType(GalleryType.DrawingGallery)
             .WithDescription(null)
             .WithTitle(null)
             .BuildImageUpload();
@@ -147,7 +147,7 @@ public sealed class GalleryProcessorTests
             .WithTitle("Test Title")
             .WithDescription("Test Description")
             .WithAltText("Test Alt Text")
-            .WithImageType(ImageType.TattooImage)
+            .WithImageType(GalleryType.TattooGallery)
             .BuildImageUpload();
 
         var expectedBlobUrl = "https://test.blob.url/image.jpg";
@@ -181,7 +181,7 @@ public sealed class GalleryProcessorTests
     {
         // Arrange
         var galleryId = Guid.NewGuid();
-        var imageType = ImageType.OtherArt;
+        var imageType = GalleryType.Other;
 
         _mockBlobStorageProcessor.DeleteImage(galleryId, imageType)
             .Throws(new InvalidOperationException("Blob storage error"));
@@ -200,7 +200,7 @@ public sealed class GalleryProcessorTests
     {
         // Arrange
         var galleryId = Guid.NewGuid();
-        var imageType = ImageType.DrawingImage;
+        var imageType = GalleryType.DrawingGallery;
 
         _mockGalleryImageRepository.DeleteGalleryImage(galleryId, imageType)
             .Throws(new InvalidOperationException("Repository error"));
@@ -219,7 +219,7 @@ public sealed class GalleryProcessorTests
     {
         // Arrange
         var galleryId = Guid.NewGuid();
-        var imageType = ImageType.TattooImage;
+        var imageType = GalleryType.TattooGallery;
 
         // Act
         var result = await _galleryProcessor.DeleteGalleryImage(galleryId, imageType);
@@ -238,7 +238,7 @@ public sealed class GalleryProcessorTests
     public async Task GetGalleryImages_WhenRepositoryThrowsException_ReturnsEmptyCollection()
     {
         // Arrange
-        var imageType = ImageType.OtherArt;
+        var imageType = GalleryType.Other;
 
         _mockGalleryImageRepository.GetGalleryImages(imageType)
             .Throws(new InvalidOperationException("Repository error"));
@@ -257,7 +257,7 @@ public sealed class GalleryProcessorTests
     public async Task GetGalleryImages_WithEmptyResult_ReturnsEmptyCollection()
     {
         // Arrange
-        var imageType = ImageType.DrawingImage;
+        var imageType = GalleryType.DrawingGallery;
         var expectedGalleryImages = new List<GalleryImage>();
 
         _mockGalleryImageRepository.GetGalleryImages(imageType)
@@ -277,7 +277,7 @@ public sealed class GalleryProcessorTests
     public async Task GetGalleryImages_WithValidImageType_ReturnsGalleryImages()
     {
         // Arrange
-        var imageType = ImageType.TattooImage;
+        var imageType = GalleryType.TattooGallery;
         var expectedGalleryImages = new List<GalleryImage>
         {
             _galleryImageBuilder.WithImageType(imageType).BuildGalleryImage(),

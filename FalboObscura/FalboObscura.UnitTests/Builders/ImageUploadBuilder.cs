@@ -14,7 +14,7 @@ internal class ImageUploadBuilder
     private string? _description;
     private Guid _id = Guid.NewGuid();
     private IBrowserFile? _imageFile;
-    private string _imageType = ImageType.TattooImage;
+    private string _imageType = GalleryType.TattooGallery;
     private string? _title;
 
     public ImageUpload BuildImageUpload()

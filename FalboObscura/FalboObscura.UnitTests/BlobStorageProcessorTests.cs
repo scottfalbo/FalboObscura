@@ -96,7 +96,7 @@ public sealed class BlobStorageProcessorTests
     {
         // Arrange
         var imageId = Guid.NewGuid();
-        var imageType = ImageType.TattooImage;
+        var imageType = GalleryType.TattooGallery;
         var expectedMainBlobName = $"{imageType}-{imageId}";
         var expectedThumbnailBlobName = $"{expectedMainBlobName}-thumbnail";
 
@@ -116,7 +116,7 @@ public sealed class BlobStorageProcessorTests
     {
         // Arrange
         var imageId = Guid.NewGuid();
-        var imageType = ImageType.DrawingImage;
+        var imageType = GalleryType.DrawingGallery;
         var expectedException = new InvalidOperationException("Blob storage error");
 
         _mockBlobStorageClient.DeleteBlobAsync(ContainerName, Arg.Any<string>(), Arg.Any<CancellationToken>())
@@ -134,7 +134,7 @@ public sealed class BlobStorageProcessorTests
     {
         // Arrange
         var imageId = Guid.Empty;
-        var imageType = ImageType.OtherArt;
+        var imageType = GalleryType.Other;
 
         // Act
         await _blobStorageProcessor.DeleteImage(imageId, imageType);
@@ -155,7 +155,7 @@ public sealed class BlobStorageProcessorTests
         var mockBrowserFile = CreateMockBrowserFile();
         var imageUpload = _imageUploadBuilder
             .WithImageFile(mockBrowserFile)
-            .WithImageType(ImageType.TattooImage)
+            .WithImageType(GalleryType.TattooGallery)
             .BuildImageUpload();
 
         var expectedDisplayUrl = "https://storage.example.com/display-image.jpg";
@@ -219,9 +219,9 @@ public sealed class BlobStorageProcessorTests
         // Arrange
         var testCases = new[]
         {
-            ImageType.TattooImage,
-            ImageType.DrawingImage,
-            ImageType.OtherArt
+            GalleryType.TattooGallery,
+            GalleryType.DrawingGallery,
+            GalleryType.Other
         };
 
         foreach (var imageType in testCases)
@@ -338,7 +338,7 @@ public sealed class BlobStorageProcessorTests
         var mockBrowserFile = CreateMockBrowserFile();
         var imageUpload = _imageUploadBuilder
             .WithImageFile(mockBrowserFile)
-            .WithImageType(ImageType.TattooImage)
+            .WithImageType(GalleryType.TattooGallery)
             .BuildImageUpload();
 
         var expectedUrl = "https://storage.example.com/test-image.jpg";

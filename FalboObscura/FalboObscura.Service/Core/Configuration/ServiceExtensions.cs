@@ -76,8 +76,17 @@ public static class ServiceExtensions
 
         if (!string.IsNullOrEmpty(keyVaultUri))
         {
-            var credential = new DefaultAzureCredential();
-            builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
+            try
+            {
+                var credential = new DefaultAzureCredential();
+                builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
+            }
+            catch (Azure.Identity.CredentialUnavailableException ex)
+            {
+                // Key Vault authentication failed - continue without Key Vault for local development
+                Console.WriteLine($"Warning: Unable to connect to Azure Key Vault: {ex.Message}");
+                Console.WriteLine("Continuing with local configuration (appsettings.json/user secrets)");
+            }
         }
     }
 

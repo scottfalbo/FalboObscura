@@ -13,6 +13,8 @@ public class GalleryImage
 
     public string? Description { get; set; }
 
+    public Guid GalleryId { get; set; }
+
     public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required(ErrorMessage = "Image thumbnail URL is required")]

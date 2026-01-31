@@ -9,11 +9,9 @@ namespace FalboObscura.Core.Processors;
 
 public class GalleryProcessor(
     IGalleryRepository galleryRepository,
-    IGalleryImageRepository galleryImageRepository,
     IBlobStorageProcessor blobStorageProcessor) : IGalleryProcessor
 {
     private readonly IBlobStorageProcessor _blobStorageProcessor = blobStorageProcessor ?? throw new ArgumentNullException(nameof(blobStorageProcessor));
-    private readonly IGalleryImageRepository _galleryImageRepository = galleryImageRepository ?? throw new ArgumentNullException(nameof(galleryImageRepository));
     private readonly IGalleryRepository _galleryRepository = galleryRepository ?? throw new ArgumentNullException(nameof(galleryRepository));
 
     public async Task<Gallery> CreateGallery(Gallery gallery)
@@ -31,11 +29,11 @@ public class GalleryProcessor(
         }
     }
 
-    public async Task<bool> DeleteGallery(Guid id)
+    public async Task<bool> DeleteGallery(Gallery gallery)
     {
         try
         {
-            await _galleryRepository.DeleteGallery(id, "Gallery");
+            await _galleryRepository.DeleteGallery(gallery.Id, gallery.GalleryType);
             return true;
         }
         catch (Exception)
@@ -45,17 +43,17 @@ public class GalleryProcessor(
         }
     }
 
-    public async Task<Gallery?> GetGallery(Guid id)
+    public async Task<IEnumerable<Gallery>> GetGalleries(string galleryType)
     {
         try
         {
-            var gallery = await _galleryRepository.GetGallery(id, "Gallery");
-            return gallery;
+            var galleries = await _galleryRepository.GetGalleries(galleryType);
+            return galleries;
         }
         catch (Exception)
         {
             // TODO: implement exception handling
-            return null;
+            return [];
         }
     }
 
@@ -71,7 +69,7 @@ public class GalleryProcessor(
         }
     }
 
-    public async Task<GalleryImage> CreateGalleryImage(ImageUpload imageUpload)
+    public async Task<bool> AddGalleryImage(ImageUpload imageUpload, Gallery gallery)
     {
         try
         {
@@ -79,7 +77,6 @@ public class GalleryProcessor(
             {
                 AltText = imageUpload.AltText,
                 Description = imageUpload.Description,
-                ImageType = imageUpload.ImageType,
                 Title = imageUpload.Title,
             };
 
@@ -90,56 +87,32 @@ public class GalleryProcessor(
             galleryImage.ImageUrl = blobUrl;
             galleryImage.ImageThumbnailUrl = $"{blobUrl}-thumbnail";
 
-            await _galleryImageRepository.CreateGalleryImage(galleryImage);
+            gallery.GalleryImages.Add(galleryImage);
+            await _galleryRepository.UpdateGallery(gallery);
 
-            return galleryImage;
+            return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
             // TODO: implement exception handling
-            throw new Exception("womp womp", ex);
+            return false;
         }
     }
 
-    public async Task<bool> DeleteGalleryImage(Guid id, string imageType)
+    public async Task<bool> RemoveGalleryImage(GalleryImage galleryImage, Gallery gallery)
     {
         try
         {
-            await _galleryImageRepository.DeleteGalleryImage(id, imageType);
-            await _blobStorageProcessor.DeleteImage(id, imageType);
+            gallery.GalleryImages.Remove(galleryImage);
+            await _galleryRepository.UpdateGallery(gallery);
+
             return true;
         }
         catch (Exception)
         {
             // TODO: implement exception handling
             return false;
-        }
-    }
-
-    public async Task<GalleryImage?> GetGalleryImage(Guid id, string imageType)
-    {
-        try
-        {
-            var galleryImage = await _galleryImageRepository.GetGalleryImage(id, imageType);
-            return galleryImage;
-        }
-        catch (Exception)
-        {
-            // TODO: implement exception handling
-            return null;
-        }
-    }
-
-    public async Task UpdateGalleryImage(GalleryImage galleryImage)
-    {
-        try
-        {
-            await _galleryImageRepository.UpdateGalleryImage(galleryImage);
-        }
-        catch (Exception)
-        {
-            // TODO: implement exception handling
         }
     }
 }

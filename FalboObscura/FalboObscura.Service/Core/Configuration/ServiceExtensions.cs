@@ -7,7 +7,6 @@ using Azure.Storage.Blobs;
 using FalboObscura.Core.Authentication;
 using FalboObscura.Core.Clients;
 using FalboObscura.Core.Processors;
-using FalboObscura.Core.Repositories;
 using Microsoft.AspNetCore.Identity;
 
 namespace FalboObscura.Core.Configuration;
@@ -81,7 +80,7 @@ public static class ServiceExtensions
                 var credential = new DefaultAzureCredential();
                 builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
             }
-            catch (Azure.Identity.CredentialUnavailableException ex)
+            catch (CredentialUnavailableException ex)
             {
                 // Key Vault authentication failed - continue without Key Vault for local development
                 Console.WriteLine($"Warning: Unable to connect to Azure Key Vault: {ex.Message}");
@@ -92,7 +91,6 @@ public static class ServiceExtensions
 
     public static void AddTransients(this WebApplicationBuilder builder)
     {
-        builder.Services.AddTransient<IGalleryImageRepository, GalleryImageRepository>();
         builder.Services.AddTransient<IGalleryProcessor, GalleryProcessor>();
         builder.Services.AddTransient<IBlobStorageClient, BlobStorageClient>();
         builder.Services.AddTransient<IBlobStorageProcessor, BlobStorageProcessor>();

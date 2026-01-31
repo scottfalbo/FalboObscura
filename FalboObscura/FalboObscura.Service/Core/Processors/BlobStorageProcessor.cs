@@ -5,8 +5,8 @@
 using FalboObscura.Core.Clients;
 using FalboObscura.Core.Models;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 
 namespace FalboObscura.Core.Processors;
 

@@ -18,7 +18,7 @@ namespace FalboObscura.UnitTests;
 public sealed class BlobStorageProcessorTests
 {
     private readonly ImageUploadBuilder _imageUploadBuilder = new();
-    
+
     private IBlobStorageClient _mockBlobStorageClient = default!;
     private BlobStorageProcessor _blobStorageProcessor = default!;
 
@@ -39,11 +39,11 @@ public sealed class BlobStorageProcessorTests
         mockFile.Name.Returns(fileName);
         mockFile.ContentType.Returns(contentType);
         mockFile.Size.Returns(size);
-        
+
         // Create a simple test image stream (minimal JPEG header + data)
         var imageBytes = CreateTestImageBytes();
         var stream = new MemoryStream(imageBytes);
-        
+
         mockFile.OpenReadStream(Arg.Any<long>(), Arg.Any<CancellationToken>())
                .Returns(_ => new MemoryStream(imageBytes));
 
@@ -55,18 +55,18 @@ public sealed class BlobStorageProcessorTests
         // Create a proper test image using ImageSharp to ensure compatibility
         using var image = new Image<SixLabors.ImageSharp.PixelFormats.Rgba32>(10, 10);
         using var stream = new MemoryStream();
-        
+
         // Fill with a simple pattern
         image.Mutate(x => x.BackgroundColor(Color.Red));
-        
+
         // Save as JPEG
         var encoder = new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder();
         image.SaveAsJpeg(stream, encoder);
-        
+
         return stream.ToArray();
     }
 
-    #endregion
+    #endregion Helper Methods
 
     #region Constructor Tests
 
@@ -87,7 +87,7 @@ public sealed class BlobStorageProcessorTests
         Assert.ThrowsException<ArgumentNullException>(() => new BlobStorageProcessor(null!));
     }
 
-    #endregion
+    #endregion Constructor Tests
 
     #region DeleteImage Tests
 
@@ -123,7 +123,7 @@ public sealed class BlobStorageProcessorTests
                               .Throws(expectedException);
 
         // Act & Assert
-        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => 
+        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() =>
             _blobStorageProcessor.DeleteImage(imageId, imageType));
 
         Assert.AreEqual(expectedException.Message, exception.Message);
@@ -144,7 +144,7 @@ public sealed class BlobStorageProcessorTests
         await _mockBlobStorageClient.Received(1).DeleteBlobAsync(ContainerName, $"{imageType}-{Guid.Empty}-thumbnail", Arg.Any<CancellationToken>());
     }
 
-    #endregion
+    #endregion DeleteImage Tests
 
     #region StoreImage Tests
 
@@ -172,10 +172,10 @@ public sealed class BlobStorageProcessorTests
 
         // Verify both display and thumbnail uploads were called
         await _mockBlobStorageClient.Received(2).UploadBlobAsync(
-            ContainerName, 
-            Arg.Any<string>(), 
-            Arg.Any<Stream>(), 
-            "image/jpeg", 
+            ContainerName,
+            Arg.Any<string>(),
+            Arg.Any<Stream>(),
+            "image/jpeg",
             Arg.Any<CancellationToken>());
 
         // Verify specific blob names
@@ -183,17 +183,17 @@ public sealed class BlobStorageProcessorTests
         var expectedThumbnailBlobName = $"{expectedDisplayBlobName}-thumbnail";
 
         await _mockBlobStorageClient.Received(1).UploadBlobAsync(
-            ContainerName, 
-            expectedDisplayBlobName, 
-            Arg.Any<Stream>(), 
-            "image/jpeg", 
+            ContainerName,
+            expectedDisplayBlobName,
+            Arg.Any<Stream>(),
+            "image/jpeg",
             Arg.Any<CancellationToken>());
 
         await _mockBlobStorageClient.Received(1).UploadBlobAsync(
-            ContainerName, 
-            expectedThumbnailBlobName, 
-            Arg.Any<Stream>(), 
-            "image/jpeg", 
+            ContainerName,
+            expectedThumbnailBlobName,
+            Arg.Any<Stream>(),
+            "image/jpeg",
             Arg.Any<CancellationToken>());
     }
 
@@ -206,7 +206,7 @@ public sealed class BlobStorageProcessorTests
             .BuildImageUpload();
 
         // Act & Assert
-        var exception = await Assert.ThrowsExceptionAsync<ArgumentException>(() => 
+        var exception = await Assert.ThrowsExceptionAsync<ArgumentException>(() =>
             _blobStorageProcessor.StoreImage(imageUpload));
 
         Assert.AreEqual("ImageFile cannot be null (Parameter 'imageUpload')", exception.Message);
@@ -228,7 +228,7 @@ public sealed class BlobStorageProcessorTests
         {
             // Reset the mock for each test case
             _mockBlobStorageClient.ClearReceivedCalls();
-            
+
             var mockBrowserFile = CreateMockBrowserFile();
             var imageUpload = _imageUploadBuilder
                 .WithImageFile(mockBrowserFile)
@@ -247,17 +247,17 @@ public sealed class BlobStorageProcessorTests
             var expectedThumbnailBlobName = $"{expectedDisplayBlobName}-thumbnail";
 
             await _mockBlobStorageClient.Received(1).UploadBlobAsync(
-                ContainerName, 
-                expectedDisplayBlobName, 
-                Arg.Any<Stream>(), 
-                "image/jpeg", 
+                ContainerName,
+                expectedDisplayBlobName,
+                Arg.Any<Stream>(),
+                "image/jpeg",
                 Arg.Any<CancellationToken>());
 
             await _mockBlobStorageClient.Received(1).UploadBlobAsync(
-                ContainerName, 
-                expectedThumbnailBlobName, 
-                Arg.Any<Stream>(), 
-                "image/jpeg", 
+                ContainerName,
+                expectedThumbnailBlobName,
+                Arg.Any<Stream>(),
+                "image/jpeg",
                 Arg.Any<CancellationToken>());
         }
     }
@@ -276,7 +276,7 @@ public sealed class BlobStorageProcessorTests
                               .Throws(expectedException);
 
         // Act & Assert
-        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => 
+        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() =>
             _blobStorageProcessor.StoreImage(imageUpload));
 
         Assert.AreEqual(expectedException.Message, exception.Message);
@@ -292,13 +292,13 @@ public sealed class BlobStorageProcessorTests
             .BuildImageUpload();
 
         var expectedException = new InvalidOperationException("Upload failed");
-        
+
         // Setup: Any upload call fails
         _mockBlobStorageClient.UploadBlobAsync(ContainerName, Arg.Any<string>(), Arg.Any<Stream>(), "image/jpeg", Arg.Any<CancellationToken>())
                               .Throws(expectedException);
 
         // Act & Assert
-        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => 
+        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() =>
             _blobStorageProcessor.StoreImage(imageUpload));
 
         Assert.AreEqual(expectedException.Message, exception.Message);
@@ -322,12 +322,12 @@ public sealed class BlobStorageProcessorTests
 
         // Assert
         Assert.AreEqual(expectedUrl, result);
-        
+
         // Verify that the file was opened with the correct max size (10MB limit)
         mockBrowserFile.Received(2).OpenReadStream(10 * 1024 * 1024, Arg.Any<CancellationToken>());
     }
 
-    #endregion
+    #endregion StoreImage Tests
 
     #region Integration Tests
 
@@ -349,17 +349,17 @@ public sealed class BlobStorageProcessorTests
 
         // Act - Store Image
         var storeResult = await _blobStorageProcessor.StoreImage(imageUpload);
-        
+
         // Act - Delete Image
         await _blobStorageProcessor.DeleteImage(imageUpload.Id, imageUpload.ImageType);
 
         // Assert
         Assert.AreEqual(expectedUrl, storeResult);
-        
+
         // Verify complete workflow
         await _mockBlobStorageClient.Received(2).UploadBlobAsync(ContainerName, Arg.Any<string>(), Arg.Any<Stream>(), "image/jpeg", Arg.Any<CancellationToken>());
         await _mockBlobStorageClient.Received(2).DeleteBlobAsync(ContainerName, Arg.Any<string>(), Arg.Any<CancellationToken>());
     }
 
-    #endregion
+    #endregion Integration Tests
 }

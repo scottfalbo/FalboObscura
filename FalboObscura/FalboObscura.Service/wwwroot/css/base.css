@@ -1,7 +1,5 @@
 @import url('./themes.css');
 
-
-
 /* Base styles using CSS custom properties */
 body {
     background-color: var(--primary-bg);
@@ -48,19 +46,19 @@ input, select, textarea {
     border-color: var(--accent-color);
 }
 
-.btn-primary:hover {
-    background-color: var(--accent-hover);
-    border-color: var(--accent-hover);
-}
+    .btn-primary:hover {
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
+    }
 
 /* Links */
 a {
     color: var(--accent-color);
 }
 
-a:hover {
-    color: var(--accent-hover);
-}
+    a:hover {
+        color: var(--accent-hover);
+    }
 
 /*  overlay */
 .loading-overlay {

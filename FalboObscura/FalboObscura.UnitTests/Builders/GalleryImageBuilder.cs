@@ -4,7 +4,6 @@
 
 using FalboObscura.Core.Models;
 using FalboObscura.Core.Models.Constants;
-using FalboObscura.Core.Models.StorageContracts;
 
 namespace FalboObscura.UnitTests.Builders;
 

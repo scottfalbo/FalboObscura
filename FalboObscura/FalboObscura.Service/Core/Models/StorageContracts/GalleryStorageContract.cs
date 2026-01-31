@@ -22,5 +22,5 @@ public class GalleryStorageContract
     public int Order { get; set; }
 
     [JsonPropertyName("partitionKey")]
-    public string PartitionKey { get; } = "Gallery";
+    public string PartitionKey { get; set; } = "Gallery";
 }

@@ -17,7 +17,7 @@ public class ThemeService : IThemeService
     public ThemeService(IJSRuntime jsRuntime)
     {
         _jsRuntime = jsRuntime ?? throw new ArgumentNullException(nameof(jsRuntime));
-        
+
         // Initialize with available themes - easily expandable
         _availableThemes = new List<Theme>
         {
@@ -59,11 +59,11 @@ public class ThemeService : IThemeService
     public async Task SetThemeAsync(string themeName)
     {
         var theme = _availableThemes.FirstOrDefault(t => t.Name.Equals(themeName, StringComparison.OrdinalIgnoreCase));
-        
+
         if (theme != null && theme.Name != _currentTheme.Name)
         {
             _currentTheme = theme;
-            
+
             try
             {
                 await _jsRuntime.InvokeVoidAsync("themeStorage.setTheme", themeName);
@@ -73,7 +73,7 @@ public class ThemeService : IThemeService
             {
                 // If JS interop fails, continue without persistence
             }
-            
+
             ThemeChanged?.Invoke(this, _currentTheme);
         }
     }

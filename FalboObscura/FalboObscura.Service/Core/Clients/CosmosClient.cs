@@ -29,7 +29,7 @@ public class CosmosClient(Microsoft.Azure.Cosmos.CosmosClient cosmosClient) : IC
         var container = GetContainer(databaseName, containerName);
         var queryDefinition = new QueryDefinition("SELECT * FROM c");
         var requestOptions = new QueryRequestOptions { PartitionKey = partitionKey };
-        
+
         var iterator = container.GetItemQueryIterator<T>(queryDefinition, requestOptions: requestOptions);
         var results = new List<T>();
 

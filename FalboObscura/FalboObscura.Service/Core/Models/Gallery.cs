@@ -8,7 +8,7 @@ public class Gallery
 {
     public string Description { get; set; } = "Gallery of images.";
 
-    public IEnumerable<GalleryImage> GalleryImages { get; set; } = default!;
+    public List<GalleryImage> GalleryImages { get; set; } = default!;
 
     public string GalleryName { get; set; } = "Gallery";
 

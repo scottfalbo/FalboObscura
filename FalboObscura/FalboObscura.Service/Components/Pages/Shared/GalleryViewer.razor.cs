@@ -48,7 +48,7 @@ public partial class GalleryViewer : ComponentBase
         StateHasChanged();
 
         UploadModel.ImageType = ImageType;
-        await GalleryProcessor.CreateGalleryImage(UploadModel);
+        await GalleryProcessor.AddGalleryImage(UploadModel);
 
         GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
 
@@ -62,7 +62,7 @@ public partial class GalleryViewer : ComponentBase
     {
         if (GalleryProcessor != null && !string.IsNullOrEmpty(DeleteImageId) && Guid.TryParse(DeleteImageId, out var imageId))
         {
-            var success = await GalleryProcessor.DeleteGalleryImage(imageId, ImageType);
+            var success = await GalleryProcessor.RemoveGalleryImage(imageId, ImageType);
 
             if (success)
             {

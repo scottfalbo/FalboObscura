@@ -15,7 +15,7 @@ namespace FalboObscura.UnitTests;
 public sealed class ThemeServiceTests
 {
     private readonly ThemeBuilder _themeBuilder = new();
-    
+
     private IJSRuntime _mockJSRuntime = default!;
     private ThemeService _themeService = default!;
 
@@ -39,7 +39,7 @@ public sealed class ThemeServiceTests
         Assert.AreEqual("dark", service.CurrentTheme.Name);
         Assert.AreEqual("theme-dark", service.CurrentTheme.CssClass);
         Assert.AreEqual(2, service.AvailableThemes.Count());
-        
+
         var availableThemeNames = service.AvailableThemes.Select(t => t.Name).ToList();
         CollectionAssert.Contains(availableThemeNames, "dark");
         CollectionAssert.Contains(availableThemeNames, "light");
@@ -65,7 +65,7 @@ public sealed class ThemeServiceTests
         Assert.IsNull(availableThemes as List<Theme>);
     }
 
-    #endregion
+    #endregion Constructor Tests
 
     #region InitializeAsync Tests
 
@@ -153,7 +153,7 @@ public sealed class ThemeServiceTests
         Assert.IsFalse(themeChangedFired);
     }
 
-    #endregion
+    #endregion InitializeAsync Tests
 
     #region SetThemeAsync Tests
 
@@ -162,7 +162,7 @@ public sealed class ThemeServiceTests
     {
         // Arrange
         var newThemeName = "light";
-        
+
         bool themeChangedFired = false;
         Theme? changedTheme = null;
         _themeService.ThemeChanged += (sender, theme) =>
@@ -189,7 +189,7 @@ public sealed class ThemeServiceTests
     {
         // Arrange
         var newThemeName = "LIGHT"; // Different case
-        
+
         bool themeChangedFired = false;
         _themeService.ThemeChanged += (sender, theme) => themeChangedFired = true;
 
@@ -199,7 +199,7 @@ public sealed class ThemeServiceTests
         // Assert
         Assert.AreEqual("light", _themeService.CurrentTheme.Name); // Should match actual theme name
         Assert.IsTrue(themeChangedFired);
-        
+
         // Verify JS interop was called
         Assert.AreEqual(2, _mockJSRuntime.ReceivedCalls().Count());
     }
@@ -210,7 +210,7 @@ public sealed class ThemeServiceTests
         // Arrange
         var invalidThemeName = "invalid-theme";
         var originalTheme = _themeService.CurrentTheme.Name;
-        
+
         bool themeChangedFired = false;
         _themeService.ThemeChanged += (sender, theme) => themeChangedFired = true;
 
@@ -230,7 +230,7 @@ public sealed class ThemeServiceTests
     {
         // Arrange - Current theme is already "dark"
         var sameThemeName = "dark";
-        
+
         bool themeChangedFired = false;
         _themeService.ThemeChanged += (sender, theme) => themeChangedFired = true;
 
@@ -250,12 +250,12 @@ public sealed class ThemeServiceTests
     {
         // Arrange
         var newThemeName = "light";
-        
+
         // Setup JS runtime to throw exception when any InvokeAsync is called
         _mockJSRuntime
             .When(x => x.InvokeAsync<object>("themeStorage.setTheme", Arg.Any<object[]>()))
             .Do(x => throw new JSException("JS Error"));
-        
+
         bool themeChangedFired = false;
         _themeService.ThemeChanged += (sender, theme) => themeChangedFired = true;
 
@@ -266,7 +266,7 @@ public sealed class ThemeServiceTests
         Assert.IsTrue(themeChangedFired);
     }
 
-    #endregion
+    #endregion SetThemeAsync Tests
 
     #region GetThemeAsync Tests
 
@@ -294,7 +294,7 @@ public sealed class ThemeServiceTests
         Assert.AreEqual("light", result);
     }
 
-    #endregion
+    #endregion GetThemeAsync Tests
 
     #region GetThemeCssClass Tests
 
@@ -322,7 +322,7 @@ public sealed class ThemeServiceTests
         Assert.AreEqual("theme-light", result);
     }
 
-    #endregion
+    #endregion GetThemeCssClass Tests
 
     #region RegisterTheme Tests
 
@@ -388,7 +388,7 @@ public sealed class ThemeServiceTests
         Assert.IsTrue(themeChangedFired);
     }
 
-    #endregion
+    #endregion RegisterTheme Tests
 
     #region Event Tests
 
@@ -434,5 +434,5 @@ public sealed class ThemeServiceTests
         Assert.AreEqual("light", _themeService.CurrentTheme.Name);
     }
 
-    #endregion
+    #endregion Event Tests
 }

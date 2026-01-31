@@ -16,12 +16,12 @@
 
 <h3>GalleryViewer</h3>
 
-<p>@ImageType</p>
+<p>@GalleryType</p>
 
 <div class="gallery-images">
-    @if (GalleryImages != null && GalleryImages.Any())
+    @if (Galleries != null && Galleries.Any())
     {
-        @foreach (var image in GalleryImages)
+        @foreach (var image in Galleries)
         {
             <div class="gallery-item">
                 <img src="@image.ImageThumbnailUrl" alt="@image.AltText" />
@@ -30,7 +30,7 @@
     }
     else
     {
-        <p>No images found for type: @ImageType</p>
+        <p>No images found for type: @GalleryType</p>
     }
 </div>
 

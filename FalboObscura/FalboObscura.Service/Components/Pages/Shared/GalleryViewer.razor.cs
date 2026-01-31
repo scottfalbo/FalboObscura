@@ -15,13 +15,13 @@ public partial class GalleryViewer : ComponentBase
 
     private bool hasRendered = false;
 
-    public IEnumerable<GalleryImage> GalleryImages { get; set; } = [];
+    public IEnumerable<Gallery> Galleries { get; set; } = [];
 
     [Inject]
     public IGalleryProcessor? GalleryProcessor { get; set; }
 
     [Parameter]
-    public string ImageType { get; set; } = string.Empty;
+    public string GalleryType { get; set; } = string.Empty;
 
     private bool IsUploading { get; set; } = false;
 
@@ -32,9 +32,9 @@ public partial class GalleryViewer : ComponentBase
         if (firstRender && !hasRendered)
         {
             hasRendered = true;
-            if (GalleryProcessor != null && !string.IsNullOrEmpty(ImageType))
+            if (GalleryProcessor != null && !string.IsNullOrEmpty(GalleryType))
             {
-                GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+                Galleries = await GalleryProcessor.GetGalleries(GalleryType);
                 StateHasChanged();
             }
         }
@@ -47,10 +47,10 @@ public partial class GalleryViewer : ComponentBase
         IsUploading = true;
         StateHasChanged();
 
-        UploadModel.ImageType = ImageType;
+        UploadModel.ImageType = GalleryType;
         await GalleryProcessor.AddGalleryImage(UploadModel);
 
-        GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+        Galleries = await GalleryProcessor.GetGalleryImages(GalleryType);
 
         UploadModel = new ImageUpload();
 
@@ -62,13 +62,13 @@ public partial class GalleryViewer : ComponentBase
     {
         if (GalleryProcessor != null && !string.IsNullOrEmpty(DeleteImageId) && Guid.TryParse(DeleteImageId, out var imageId))
         {
-            var success = await GalleryProcessor.RemoveGalleryImage(imageId, ImageType);
+            var success = await GalleryProcessor.RemoveGalleryImage(imageId, GalleryType);
 
             if (success)
             {
                 DeleteImageId = string.Empty;
 
-                GalleryImages = await GalleryProcessor.GetGalleryImages(ImageType);
+                Galleries = await GalleryProcessor.GetGalleryImages(GalleryType);
                 StateHasChanged();
             }
         }

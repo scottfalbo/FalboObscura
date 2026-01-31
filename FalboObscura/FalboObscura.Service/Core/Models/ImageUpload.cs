@@ -16,7 +16,7 @@ public class ImageUpload
 
     public IBrowserFile? ImageFile { get; set; }
 
-    public string ImageType { get; set; } = default!;
+    public string GalleryType { get; set; } = default!;
 
     public string? Title { get; set; }
 }

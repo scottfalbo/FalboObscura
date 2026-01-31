@@ -21,11 +21,7 @@ public class GalleryRepository(ICosmosClient cosmosClient) : IGalleryRepository
         var storageContract = _mapper.DomainModelToStorageContract(gallery);
         var partitionKey = new PartitionKey(storageContract.PartitionKey);
 
-        await _cosmosClient.UpsertItemAsync(
-            storageContract,
-            _databaseName,
-            _containerName,
-            partitionKey);
+        await _cosmosClient.UpsertItemAsync(storageContract, _databaseName, _containerName, partitionKey);
     }
 
     public async Task DeleteGallery(Guid id, string partitionKey)
@@ -34,11 +30,7 @@ public class GalleryRepository(ICosmosClient cosmosClient) : IGalleryRepository
         {
             var partitionKeyValue = new PartitionKey(partitionKey);
 
-            await _cosmosClient.DeleteItemAsync<GalleryStorageContract>(
-                id.ToString(),
-                _databaseName,
-                _containerName,
-                partitionKeyValue);
+            await _cosmosClient.DeleteItemAsync<GalleryStorageContract>(id.ToString(), _databaseName, _containerName, partitionKeyValue);
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
@@ -50,10 +42,7 @@ public class GalleryRepository(ICosmosClient cosmosClient) : IGalleryRepository
     {
         var partitionKeyValue = new PartitionKey(partitionKey);
 
-        var storageContracts = await _cosmosClient.GetItemsByPartitionKeyAsync<GalleryStorageContract>(
-            _databaseName,
-            _containerName,
-            partitionKeyValue);
+        var storageContracts = await _cosmosClient.GetItemsByPartitionKeyAsync<GalleryStorageContract>(_databaseName, _containerName, partitionKeyValue);
 
         var galleries = storageContracts.Select(_mapper.StorageContractToDomainModel);
 
@@ -65,11 +54,7 @@ public class GalleryRepository(ICosmosClient cosmosClient) : IGalleryRepository
         var storageContract = _mapper.DomainModelToStorageContract(gallery);
         var partitionKey = new PartitionKey(storageContract.PartitionKey);
 
-        await _cosmosClient.UpsertItemAsync(
-            storageContract,
-            _databaseName,
-            _containerName,
-            partitionKey);
+        await _cosmosClient.UpsertItemAsync(storageContract, _databaseName, _containerName, partitionKey);
 
         return gallery;
     }

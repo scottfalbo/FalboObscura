@@ -7,6 +7,7 @@ using Azure.Storage.Blobs;
 using FalboObscura.Core.Authentication;
 using FalboObscura.Core.Clients;
 using FalboObscura.Core.Processors;
+using FalboObscura.Core.Repositories;
 using Microsoft.AspNetCore.Identity;
 
 namespace FalboObscura.Core.Configuration;
@@ -92,6 +93,7 @@ public static class ServiceExtensions
     public static void AddTransients(this WebApplicationBuilder builder)
     {
         builder.Services.AddTransient<IGalleryProcessor, GalleryProcessor>();
+        builder.Services.AddTransient<IGalleryRepository, GalleryRepository>();
         builder.Services.AddTransient<IBlobStorageClient, BlobStorageClient>();
         builder.Services.AddTransient<IBlobStorageProcessor, BlobStorageProcessor>();
     }

@@ -33,6 +33,15 @@ public class GalleryProcessor(
     {
         try
         {
+            // Delete all images from blob storage
+            if (gallery.GalleryImages != null && gallery.GalleryImages.Any())
+            {
+                foreach (var image in gallery.GalleryImages)
+                {
+                    await _blobStorageProcessor.DeleteImage(image.Id);
+                }
+            }
+
             await _galleryRepository.DeleteGallery(gallery.Id, gallery.GalleryType);
             return true;
         }
@@ -78,6 +87,7 @@ public class GalleryProcessor(
                 AltText = imageUpload.AltText,
                 Description = imageUpload.Description,
                 Title = imageUpload.Title,
+                Order = gallery.GalleryImages?.Any() == true ? gallery.GalleryImages.Max(i => i.Order) + 1 : 0
             };
 
             imageUpload.Id = galleryImage.Id;
@@ -87,7 +97,7 @@ public class GalleryProcessor(
             galleryImage.ImageUrl = blobUrl;
             galleryImage.ImageThumbnailUrl = $"{blobUrl}-thumbnail";
 
-            gallery.GalleryImages.Add(galleryImage);
+            gallery.GalleryImages!.Add(galleryImage);
             await _galleryRepository.UpdateGallery(gallery);
 
             return true;
@@ -105,7 +115,17 @@ public class GalleryProcessor(
         try
         {
             gallery.GalleryImages.Remove(galleryImage);
+
+            // Reorder remaining images
+            var orderedImages = gallery.GalleryImages.OrderBy(i => i.Order).ToList();
+            for (int i = 0; i < orderedImages.Count; i++)
+            {
+                orderedImages[i].Order = i;
+            }
+            gallery.GalleryImages = orderedImages;
+
             await _galleryRepository.UpdateGallery(gallery);
+            await _blobStorageProcessor.DeleteImage(galleryImage.Id);
 
             return true;
         }

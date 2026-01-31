@@ -25,7 +25,7 @@ internal class ImageUploadBuilder
             Description = _description,
             Id = _id,
             ImageFile = _imageFile,
-            ImageType = _imageType,
+            GalleryType = _imageType,
             Title = _title,
         };
     }

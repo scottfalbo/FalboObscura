@@ -11,9 +11,7 @@ namespace FalboObscura.Components.Pages.Shared;
 
 public partial class GalleryViewer : ComponentBase
 {
-    private string DeleteImageId = string.Empty;
-
-    private bool hasRendered = false;
+    private bool _hasRendered = false;
 
     public IEnumerable<Gallery> Galleries { get; set; } = [];
 
@@ -23,70 +21,314 @@ public partial class GalleryViewer : ComponentBase
     [Parameter]
     public string GalleryType { get; set; } = string.Empty;
 
-    private bool IsUploading { get; set; } = false;
+    private bool IsLoading { get; set; } = false;
 
+    private string LoadingMessage { get; set; } = "Loading...";
+
+    private Gallery NewGalleryModel { get; set; } = new();
+
+    // Single upload model - tracks which gallery via SelectedGalleryId
     private ImageUpload UploadModel { get; set; } = new();
+    private Guid? SelectedGalleryId { get; set; }
+    private List<IBrowserFile> SelectedFiles { get; set; } = [];
+    private const int MaxFileCount = 10;
+    private const long MaxFileSize = 10 * 1024 * 1024; // 10 MB
+
+    // Drag and drop state for galleries
+    private Gallery? DraggedGallery { get; set; }
+
+    // Drag and drop state for images
+    private GalleryImage? DraggedImage { get; set; }
+    private Guid? DraggedImageGalleryId { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && !hasRendered)
+        if (firstRender && !_hasRendered)
         {
-            hasRendered = true;
-            if (GalleryProcessor != null && !string.IsNullOrEmpty(GalleryType))
-            {
-                Galleries = await GalleryProcessor.GetGalleries(GalleryType);
-                StateHasChanged();
-            }
+            _hasRendered = true;
+            await LoadGalleries();
         }
     }
 
-    private async Task CreateGalleryImage()
+    private async Task LoadGalleries()
     {
-        if (GalleryProcessor == null || UploadModel.ImageFile == null) return;
+        if (GalleryProcessor != null && !string.IsNullOrEmpty(GalleryType))
+        {
+            Galleries = await GalleryProcessor.GetGalleries(GalleryType);
+            StateHasChanged();
+        }
+    }
 
-        IsUploading = true;
-        StateHasChanged();
-
-        UploadModel.ImageType = GalleryType;
-        await GalleryProcessor.AddGalleryImage(UploadModel);
-
-        Galleries = await GalleryProcessor.GetGalleryImages(GalleryType);
-
-        UploadModel = new ImageUpload();
-
-        IsUploading = false;
+    private void StartAddImage(Gallery gallery)
+    {
+        SelectedGalleryId = gallery.Id;
+        UploadModel = new ImageUpload { GalleryType = GalleryType };
         StateHasChanged();
     }
 
-    private async Task HandleDeleteSubmit()
+    private void CancelAddImage()
     {
-        if (GalleryProcessor != null && !string.IsNullOrEmpty(DeleteImageId) && Guid.TryParse(DeleteImageId, out var imageId))
+        SelectedGalleryId = null;
+        UploadModel = new ImageUpload();
+        SelectedFiles = [];
+        StateHasChanged();
+    }
+
+    private async Task HandleCreateGallery()
+    {
+        if (GalleryProcessor == null || string.IsNullOrEmpty(NewGalleryModel.GalleryName)) return;
+
+        IsLoading = true;
+        LoadingMessage = "Creating gallery...";
+        StateHasChanged();
+
+        try
         {
-            var success = await GalleryProcessor.RemoveGalleryImage(imageId, GalleryType);
+            NewGalleryModel.GalleryType = GalleryType;
+            NewGalleryModel.GalleryImages = new List<GalleryImage>();
+            NewGalleryModel.Order = Galleries.Any() ? Galleries.Max(g => g.Order) + 1 : 0;
+            await GalleryProcessor.CreateGallery(NewGalleryModel);
 
-            if (success)
+            NewGalleryModel = new Gallery();
+            await LoadGalleries();
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleDeleteGallery(Gallery gallery)
+    {
+        if (GalleryProcessor == null) return;
+
+        IsLoading = true;
+        LoadingMessage = "Deleting gallery...";
+        StateHasChanged();
+
+        try
+        {
+            await GalleryProcessor.DeleteGallery(gallery);
+
+            // Reorder remaining galleries
+            var remainingGalleries = Galleries.Where(g => g.Id != gallery.Id).OrderBy(g => g.Order).ToList();
+            for (int i = 0; i < remainingGalleries.Count; i++)
             {
-                DeleteImageId = string.Empty;
-
-                Galleries = await GalleryProcessor.GetGalleryImages(GalleryType);
-                StateHasChanged();
+                if (remainingGalleries[i].Order != i)
+                {
+                    remainingGalleries[i].Order = i;
+                    await GalleryProcessor.UpdateGallery(remainingGalleries[i]);
+                }
             }
+
+            await LoadGalleries();
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleAddImage()
+    {
+        if (GalleryProcessor == null || SelectedGalleryId == null || !SelectedFiles.Any()) return;
+
+        var gallery = Galleries.FirstOrDefault(g => g.Id == SelectedGalleryId);
+        if (gallery == null) return;
+
+        IsLoading = true;
+        var totalFiles = SelectedFiles.Count;
+        var currentFile = 0;
+        StateHasChanged();
+
+        try
+        {
+            foreach (var file in SelectedFiles)
+            {
+                currentFile++;
+                LoadingMessage = $"Uploading image {currentFile} of {totalFiles}...";
+                StateHasChanged();
+
+                var uploadModel = new ImageUpload
+                {
+                    GalleryType = GalleryType,
+                    ImageFile = file,
+                    AltText = UploadModel.AltText,
+                    Title = UploadModel.Title,
+                    Description = UploadModel.Description
+                };
+
+                await GalleryProcessor.AddGalleryImage(uploadModel, gallery);
+
+                // Refresh gallery to get updated image list for next iteration
+                var updatedGalleries = await GalleryProcessor.GetGalleries(GalleryType);
+                gallery = updatedGalleries.FirstOrDefault(g => g.Id == SelectedGalleryId);
+                if (gallery == null) break;
+            }
+
+            SelectedGalleryId = null;
+            UploadModel = new ImageUpload();
+            SelectedFiles = [];
+            await LoadGalleries();
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleDeleteImage(GalleryImage image, Gallery gallery)
+    {
+        if (GalleryProcessor == null) return;
+
+        IsLoading = true;
+        LoadingMessage = "Deleting image...";
+        StateHasChanged();
+
+        try
+        {
+            await GalleryProcessor.RemoveGalleryImage(image, gallery);
+            await LoadGalleries();
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 
     private void HandleFileSelected(InputFileChangeEventArgs e)
     {
-        const long maxFileSize = 10 * 1024 * 1024; // 10 MB
+        SelectedFiles = [];
 
-        var file = e.File;
-        if (file.Size > maxFileSize)
+        var files = e.GetMultipleFiles(MaxFileCount);
+        foreach (var file in files)
         {
-            // TODO: Show error message to user
-            Console.WriteLine($"File too large: {file.Size} bytes. Max allowed: {maxFileSize} bytes");
-            return;
+            if (file.Size > MaxFileSize)
+            {
+                Console.WriteLine($"File '{file.Name}' too large: {file.Size} bytes. Max allowed: {MaxFileSize} bytes. Skipping.");
+                continue;
+            }
+            SelectedFiles.Add(file);
         }
 
-        UploadModel.ImageFile = file;
+        // For single file, also set on UploadModel for backward compatibility
+        if (SelectedFiles.Count == 1)
+        {
+            UploadModel.ImageFile = SelectedFiles[0];
+        }
+
         StateHasChanged();
+    }
+
+    private void HandleDragStart(Gallery gallery)
+    {
+        DraggedGallery = gallery;
+    }
+
+    private void HandleDragEnd()
+    {
+        DraggedGallery = null;
+    }
+
+    private async Task HandleDrop(Gallery targetGallery)
+    {
+        if (DraggedGallery == null || DraggedGallery.Id == targetGallery.Id || GalleryProcessor == null) return;
+
+        var galleriesList = Galleries.OrderBy(g => g.Order).ToList();
+        var draggedIndex = galleriesList.FindIndex(g => g.Id == DraggedGallery.Id);
+        var targetIndex = galleriesList.FindIndex(g => g.Id == targetGallery.Id);
+
+        if (draggedIndex < 0 || targetIndex < 0) return;
+
+        // Remove dragged item and insert at target position
+        var dragged = galleriesList[draggedIndex];
+        galleriesList.RemoveAt(draggedIndex);
+        galleriesList.Insert(targetIndex, dragged);
+
+        // Update order values
+        for (int i = 0; i < galleriesList.Count; i++)
+        {
+            galleriesList[i].Order = i;
+        }
+
+        // Persist changes
+        IsLoading = true;
+        LoadingMessage = "Reordering galleries...";
+        StateHasChanged();
+
+        try
+        {
+            foreach (var gallery in galleriesList)
+            {
+                await GalleryProcessor.UpdateGallery(gallery);
+            }
+            await LoadGalleries();
+        }
+        finally
+        {
+            DraggedGallery = null;
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleImageDragStart(GalleryImage image, Gallery gallery)
+    {
+        DraggedImage = image;
+        DraggedImageGalleryId = gallery.Id;
+    }
+
+    private void HandleImageDragEnd()
+    {
+        DraggedImage = null;
+        DraggedImageGalleryId = null;
+    }
+
+    private async Task HandleImageDrop(GalleryImage targetImage, Gallery gallery)
+    {
+        if (DraggedImage == null || DraggedImage.Id == targetImage.Id || GalleryProcessor == null) return;
+        if (DraggedImageGalleryId != gallery.Id) return; // Only allow reordering within same gallery
+
+        var imagesList = gallery.GalleryImages.OrderBy(i => i.Order).ToList();
+        var draggedIndex = imagesList.FindIndex(i => i.Id == DraggedImage.Id);
+        var targetIndex = imagesList.FindIndex(i => i.Id == targetImage.Id);
+
+        if (draggedIndex < 0 || targetIndex < 0) return;
+
+        // Remove dragged item and insert at target position
+        var dragged = imagesList[draggedIndex];
+        imagesList.RemoveAt(draggedIndex);
+        imagesList.Insert(targetIndex, dragged);
+
+        // Update order values
+        for (int i = 0; i < imagesList.Count; i++)
+        {
+            imagesList[i].Order = i;
+        }
+
+        // Update the gallery's image list
+        gallery.GalleryImages = imagesList;
+
+        // Persist changes
+        IsLoading = true;
+        LoadingMessage = "Reordering images...";
+        StateHasChanged();
+
+        try
+        {
+            await GalleryProcessor.UpdateGallery(gallery);
+            await LoadGalleries();
+        }
+        finally
+        {
+            DraggedImage = null;
+            DraggedImageGalleryId = null;
+            IsLoading = false;
+            StateHasChanged();
+        }
     }
 }

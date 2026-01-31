@@ -1,0 +1,56 @@
+.accordion-item {
+    cursor: grab;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.accordion-item:active {
+    cursor: grabbing;
+}
+
+.accordion-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+}
+
+.accordion-item:not(.dragging):hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.drag-handle {
+    cursor: grab;
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+.drag-handle:hover {
+    color: #495057;
+}
+
+.accordion-button {
+    display: flex;
+    align-items: center;
+}
+
+/* Image drag and drop styles */
+.gallery-images .col-md-3,
+.gallery-images .col-sm-4,
+.gallery-images .col-6 {
+    cursor: grab;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.gallery-images .col-md-3:active,
+.gallery-images .col-sm-4:active,
+.gallery-images .col-6:active {
+    cursor: grabbing;
+}
+
+.gallery-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+}
+
+.gallery-item:not(.dragging):hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}

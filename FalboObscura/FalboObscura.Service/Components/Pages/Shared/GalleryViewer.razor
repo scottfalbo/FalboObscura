@@ -1,15 +1,16 @@
 ﻿@rendermode InteractiveServer
+@using FalboObscura.Core.Models
 @using FalboObscura.Core.Models.Constants
 
 <!-- Loading Overlay -->
-@if (IsUploading)
+@if (IsLoading)
 {
     <div class="loading-overlay">
         <div class="loading-content">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-2">Uploading image...</p>
+            <p class="mt-2">@LoadingMessage</p>
         </div>
     </div>
 }
@@ -18,87 +19,206 @@
 
 <p>@GalleryType</p>
 
-<div class="gallery-images">
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized Context="authContext">
+            <!-- Create New Gallery Form -->
+            <div class="admin-controls mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Create New Gallery</h5>
+                    </div>
+                    <div class="card-body">
+                        <EditForm Model="NewGalleryModel" OnValidSubmit="HandleCreateGallery" FormName="CreateGalleryForm">
+                            <DataAnnotationsValidator />
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="galleryName" class="form-label">Gallery Name *</label>
+                                    <InputText id="galleryName" class="form-control" @bind-Value="NewGalleryModel.GalleryName"
+                                               placeholder="Enter gallery name" />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="galleryDescription" class="form-label">Description</label>
+                                    <InputText id="galleryDescription" class="form-control" @bind-Value="NewGalleryModel.Description"
+                                               placeholder="Enter gallery description" />
+                                </div>
+                                <div class="col-md-2 mb-3 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100" disabled="@IsLoading">Create Gallery</button>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Image Modal Form (shown when a gallery is selected) -->
+            @if (SelectedGalleryId != null)
+            {
+                var selectedGallery = Galleries.FirstOrDefault(g => g.Id == SelectedGalleryId);
+                if (selectedGallery != null)
+                {
+                    <div class="card mb-4 border-primary">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Add Images to: @selectedGallery.GalleryName</h5>
+                            <button type="button" class="btn btn-light btn-sm" @onclick="CancelAddImage">Cancel</button>
+                        </div>
+                        <div class="card-body">
+                            <EditForm Model="UploadModel" OnValidSubmit="HandleAddImage" FormName="AddImageForm">
+                                <DataAnnotationsValidator />
+                                <fieldset disabled="@IsLoading">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Image Files * (max 10)</label>
+                                            <InputFile class="form-control" accept="image/*" OnChange="HandleFileSelected" multiple="true" />
+                                            @if (SelectedFiles.Any())
+                                            {
+                                                <small class="text-muted">@SelectedFiles.Count file(s) selected</small>
+                                            }
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Title (Optional - applies to all)</label>
+                                            <InputText class="form-control" @bind-Value="UploadModel.Title" placeholder="Enter image title" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Alt Text * (applies to all)</label>
+                                            <InputText class="form-control" @bind-Value="UploadModel.AltText" placeholder="Describe the image for accessibility" />
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Description (Optional - applies to all)</label>
+                                            <InputText class="form-control" @bind-Value="UploadModel.Description" placeholder="Enter image description" />
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success" disabled="@(IsLoading || !SelectedFiles.Any())">
+                                        Upload @(SelectedFiles.Count > 1 ? $"{SelectedFiles.Count} Images" : "Image")
+                                    </button>
+                                </fieldset>
+                            </EditForm>
+                        </div>
+                    </div>
+                }
+            }
+        </Authorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+<!-- Gallery Accordion -->
+<div class="accordion" id="galleryAccordion">
     @if (Galleries != null && Galleries.Any())
     {
-        @foreach (var image in Galleries)
+        var isFirst = true;
+        @foreach (var gallery in Galleries.OrderBy(g => g.Order))
         {
-            <div class="gallery-item">
-                <img src="@image.ImageThumbnailUrl" alt="@image.AltText" />
+            var accordionId = $"collapse-{gallery.Id.ToString().Replace("-", "")}";
+            var headerId = $"heading-{gallery.Id.ToString().Replace("-", "")}";
+            var buttonClass = isFirst ? "accordion-button" : "accordion-button collapsed";
+            var collapseClass = isFirst ? "accordion-collapse collapse show" : "accordion-collapse collapse";
+            var expanded = isFirst ? "true" : "false";
+            var isDragging = DraggedGallery?.Id == gallery.Id;
+            var itemClass = isDragging ? "accordion-item dragging" : "accordion-item";
+
+            <div class="@itemClass"
+                 draggable="true"
+                 @ondragstart="() => HandleDragStart(gallery)"
+                 @ondragend="HandleDragEnd"
+                 @ondragover:preventDefault
+                 @ondrop="() => HandleDrop(gallery)">
+                <h2 class="accordion-header" id="@headerId">
+                    <button class="@buttonClass" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#@accordionId" aria-expanded="@expanded" aria-controls="@accordionId">
+                        <span class="drag-handle me-2" title="Drag to reorder">&#x2630;</span>
+                        <span class="fw-bold">@gallery.GalleryName</span>
+                        <span class="badge bg-secondary ms-2">@(gallery.GalleryImages?.Count ?? 0) images</span>
+                    </button>
+                </h2>
+                <div id="@accordionId" class="@collapseClass" aria-labelledby="@headerId"
+                     data-bs-parent="#galleryAccordion">
+                    <div class="accordion-body">
+                        <!-- Gallery Description -->
+                        @if (!string.IsNullOrEmpty(gallery.Description))
+                        {
+                            <p class="text-muted">@gallery.Description</p>
+                        }
+
+                        <!-- Gallery Admin Controls -->
+                        <CascadingAuthenticationState>
+                            <AuthorizeView>
+                                <Authorized Context="galleryAuthContext">
+                                    <div class="gallery-admin-controls mb-3 p-3 bg-light rounded">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <button class="btn btn-success btn-sm me-2" @onclick="() => StartAddImage(gallery)">
+                                                    Add Image
+                                                </button>
+                                                <button class="btn btn-outline-danger btn-sm" @onclick="() => HandleDeleteGallery(gallery)">
+                                                    Delete Gallery
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Authorized>
+                            </AuthorizeView>
+                        </CascadingAuthenticationState>
+
+                        <!-- Gallery Images -->
+                        <div class="gallery-images row">
+                            @if (gallery.GalleryImages != null && gallery.GalleryImages.Any())
+                            {
+                                @foreach (var image in gallery.GalleryImages.OrderBy(i => i.Order))
+                                {
+                                    var isImageDragging = DraggedImage?.Id == image.Id;
+                                    var imageCardClass = isImageDragging ? "gallery-item card h-100 dragging" : "gallery-item card h-100";
+
+                                    <div class="col-md-3 col-sm-4 col-6 mb-3"
+                                         draggable="true"
+                                         @ondragstart="() => HandleImageDragStart(image, gallery)"
+                                         @ondragend="HandleImageDragEnd"
+                                         @ondragover:preventDefault
+                                         @ondrop="() => HandleImageDrop(image, gallery)">
+                                        <div class="@imageCardClass">
+                                            <img src="@image.ImageThumbnailUrl" alt="@image.AltText" class="card-img-top" />
+                                            <div class="card-body p-2">
+                                                @if (!string.IsNullOrEmpty(image.Title))
+                                                {
+                                                    <h6 class="card-title small mb-1">@image.Title</h6>
+                                                }
+                                                @if (!string.IsNullOrEmpty(image.Description))
+                                                {
+                                                    <p class="card-text small text-muted mb-0">@image.Description</p>
+                                                }
+                                            </div>
+                                            <CascadingAuthenticationState>
+                                                <AuthorizeView>
+                                                    <Authorized Context="imageAuthContext">
+                                                        <div class="card-footer p-1">
+                                                            <button class="btn btn-outline-danger btn-sm w-100"
+                                                                    @onclick="() => HandleDeleteImage(image, gallery)">
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </Authorized>
+                                                </AuthorizeView>
+                                            </CascadingAuthenticationState>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-12">
+                                    <p class="text-muted">No images in this gallery.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
             </div>
+            isFirst = false;
         }
     }
     else
     {
-        <p>No images found for type: @GalleryType</p>
+        <p>No galleries found for type: @GalleryType</p>
     }
 </div>
-
-<CascadingAuthenticationState>
-    <AuthorizeView>
-        <Authorized Context="authContext">
-            <div class="admin-controls mt-4">
-                <div class="image-upload-form">
-                    <h5>Add New Image</h5>
-                    <EditForm Model="UploadModel" OnValidSubmit="CreateGalleryImage">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary class="text-danger" />
-
-                        <fieldset disabled="@IsUploading">
-                            <div class="mb-3">
-                                <label for="imageFile" class="form-label">Image File *</label>
-                                <InputFile id="imageFile" class="form-control" accept="image/*"
-                                           OnChange="HandleFileSelected" multiple="false" disabled="@IsUploading" />
-                                <ValidationMessage For="@(() => UploadModel.ImageFile)" class="text-danger" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="title" class="form-label">Title (Optional)</label>
-                                <InputText id="title" class="form-control" @bind-Value="UploadModel.Title"
-                                           placeholder="Enter image title" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="altText" class="form-label">Alt Text *</label>
-                                <InputText id="altText" class="form-control" @bind-Value="UploadModel.AltText"
-                                           placeholder="Describe the image for accessibility" />
-                                <ValidationMessage For="@(() => UploadModel.AltText)" class="text-danger" />
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description (Optional)</label>
-                                <InputTextArea id="description" class="form-control" @bind-Value="UploadModel.Description"
-                                               rows="3" placeholder="Enter image description" />
-                                <ValidationMessage For="@(() => UploadModel.Description)" class="text-danger" />
-                            </div>
-                        </fieldset>
-
-                        <button type="submit" class="btn btn-success" disabled="@IsUploading">
-                            @if (IsUploading)
-                            {
-                                <span class="spinner-border spinner-border-sm" role="status"></span>
-                                <span>Uploading...</span>
-                            }
-                            else
-                            {
-                                <span>Upload Image</span>
-                            }
-                        </button>
-                    </EditForm>
-                </div>
-
-                <div class="delete-form mt-3">
-                    <h5>Delete Gallery Image</h5>
-                    <EditForm Model="DeleteImageId" OnValidSubmit="HandleDeleteSubmit">
-                        <div class="mb-3">
-                            <label for="imageId" class="form-label">Image ID (GUID):</label>
-                            <InputText id="imageId" class="form-control" @bind-Value="DeleteImageId" placeholder="Enter image GUID" />
-                        </div>
-                        <button type="submit" class="btn btn-danger">Delete Image</button>
-                    </EditForm>
-                </div>
-            </div>
-        </Authorized>
-
-    </AuthorizeView>
-</CascadingAuthenticationState>

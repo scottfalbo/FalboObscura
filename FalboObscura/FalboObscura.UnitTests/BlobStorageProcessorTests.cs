@@ -179,7 +179,7 @@ public sealed class BlobStorageProcessorTests
             Arg.Any<CancellationToken>());
 
         // Verify specific blob names
-        var expectedDisplayBlobName = $"{imageUpload.ImageType}-{imageUpload.Id}";
+        var expectedDisplayBlobName = $"{imageUpload.GalleryType}-{imageUpload.Id}";
         var expectedThumbnailBlobName = $"{expectedDisplayBlobName}-thumbnail";
 
         await _mockBlobStorageClient.Received(1).UploadBlobAsync(
@@ -351,7 +351,7 @@ public sealed class BlobStorageProcessorTests
         var storeResult = await _blobStorageProcessor.StoreImage(imageUpload);
 
         // Act - Delete Image
-        await _blobStorageProcessor.DeleteImage(imageUpload.Id, imageUpload.ImageType);
+        await _blobStorageProcessor.DeleteImage(imageUpload.Id, imageUpload.GalleryType);
 
         // Assert
         Assert.AreEqual(expectedUrl, storeResult);

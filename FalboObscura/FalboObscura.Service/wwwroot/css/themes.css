@@ -20,6 +20,16 @@
     --card-bg: #1a1a1a;
     --navbar-bg: #0d1117;
     --sidebar-bg: #161b22;
+    
+    /* Accordion */
+    --accordion-bg: #1a1a1a;
+    --accordion-text: #ffffff;
+    --accordion-border: #333333;
+    --accordion-btn-bg: #2d2d2d;
+    --accordion-btn-text: #ffffff;
+    --accordion-active-bg: #1e3a5f;
+    --accordion-active-text: #7cb3ff;
+    --accordion-body-bg: #1a1a1a;
 }
 
 /* Light Theme */
@@ -43,4 +53,14 @@
     --card-bg: #ffffff;
     --navbar-bg: #f8f9fa;
     --sidebar-bg: #ffffff;
+    
+    /* Accordion */
+    --accordion-bg: #ffffff;
+    --accordion-text: #212529;
+    --accordion-border: rgba(0, 0, 0, 0.125);
+    --accordion-btn-bg: #ffffff;
+    --accordion-btn-text: #212529;
+    --accordion-active-bg: #e7f1ff;
+    --accordion-active-text: #0c63e4;
+    --accordion-body-bg: #ffffff;
 }

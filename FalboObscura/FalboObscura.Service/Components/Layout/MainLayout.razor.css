@@ -9,12 +9,12 @@ main {
 }
 
 .sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    background-color: var(--sidebar-bg);
 }
 
 .top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
+    background-color: var(--navbar-bg);
+    border-bottom: 1px solid var(--border-color);
     justify-content: flex-end;
     height: 3.5rem;
     display: flex;
@@ -36,7 +36,7 @@ main {
             text-overflow: ellipsis;
         }
 
-@media (max-width: 640.98px) {
+@media (max-width: 1023.98px) {
     .top-row {
         justify-content: space-between;
     }
@@ -46,7 +46,7 @@ main {
         }
 }
 
-@media (min-width: 641px) {
+@media (min-width: 1024px) {
     .page {
         flex-direction: row;
     }
@@ -94,3 +94,94 @@ main {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+/* Mobile bottom bar - hidden on desktop */
+.mobile-bottom-bar {
+    display: none;
+}
+
+@media (max-width: 1023.98px) {
+    .mobile-bottom-bar {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        z-index: 1000;
+    }
+    
+    .mobile-settings-toggle {
+        display: none;
+    }
+    
+    .mobile-settings-button {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 1001;
+        transition: transform 0.2s;
+    }
+    
+    .mobile-settings-button:hover {
+        transform: scale(1.1);
+    }
+    
+    .settings-icon {
+        font-size: 1.5rem;
+    }
+    
+    .mobile-settings-panel {
+        position: fixed;
+        bottom: 70px;
+        right: 1rem;
+        background: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        display: none;
+        min-width: 180px;
+        z-index: 1000;
+    }
+    
+    .mobile-settings-toggle:checked ~ .mobile-settings-panel {
+        display: block;
+    }
+    
+    .mobile-settings-toggle:checked ~ .mobile-settings-button {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    .mobile-settings-item {
+        padding: 0.5rem 0;
+    }
+    
+    .mobile-settings-item ::deep a {
+        color: #d7d7d7;
+        text-decoration: none;
+        display: block;
+        padding: 0.25rem 0;
+    }
+    
+    .mobile-settings-item ::deep a:hover {
+        color: white;
+    }
+    
+    .mobile-settings-item ::deep select {
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #d7d7d7;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        padding: 0.5rem;
+    }
+}

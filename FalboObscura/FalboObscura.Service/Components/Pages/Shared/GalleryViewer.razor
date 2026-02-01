@@ -116,18 +116,21 @@
             var collapseClass = isFirst ? "accordion-collapse collapse show" : "accordion-collapse collapse";
             var expanded = isFirst ? "true" : "false";
             var isDragging = DraggedGallery?.Id == gallery.Id;
-            var itemClass = isDragging ? "accordion-item dragging" : "accordion-item";
+            var itemClass = isDragging ? "accordion-item dragging" : (IsAuthenticated ? "accordion-item draggable-item" : "accordion-item");
 
             <div class="@itemClass"
-                 draggable="true"
-                 @ondragstart="() => HandleDragStart(gallery)"
+                 draggable="@IsAuthenticated"
+                 @ondragstart="() => { if (IsAuthenticated) HandleDragStart(gallery); }"
                  @ondragend="HandleDragEnd"
                  @ondragover:preventDefault
-                 @ondrop="() => HandleDrop(gallery)">
+                 @ondrop="async () => { if (IsAuthenticated) await HandleDrop(gallery); }">
                 <h2 class="accordion-header" id="@headerId">
                     <button class="@buttonClass" type="button" data-bs-toggle="collapse"
                             data-bs-target="#@accordionId" aria-expanded="@expanded" aria-controls="@accordionId">
-                        <span class="drag-handle me-2" title="Drag to reorder">&#x2630;</span>
+                        @if (IsAuthenticated)
+                        {
+                            <span class="drag-handle me-2" title="Drag to reorder">&#x2630;</span>
+                        }
                         <span class="fw-bold">@gallery.GalleryName</span>
                         <span class="badge bg-secondary ms-2">@(gallery.GalleryImages?.Count ?? 0) images</span>
                     </button>
@@ -145,7 +148,7 @@
                         <CascadingAuthenticationState>
                             <AuthorizeView>
                                 <Authorized Context="galleryAuthContext">
-                                    <div class="gallery-admin-controls mb-3 p-3 bg-light rounded">
+                                    <div class="gallery-admin-controls mb-3 p-3 bg-dark rounded">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
                                                 <button class="btn btn-success btn-sm me-2" @onclick="() => StartAddImage(gallery)">
@@ -168,26 +171,21 @@
                                 @foreach (var image in gallery.GalleryImages.OrderBy(i => i.Order))
                                 {
                                     var isImageDragging = DraggedImage?.Id == image.Id;
-                                    var imageCardClass = isImageDragging ? "gallery-item card h-100 dragging" : "gallery-item card h-100";
+                                    var imageCardClass = isImageDragging ? "gallery-item card h-100 dragging" : (IsAuthenticated ? "gallery-item card h-100 draggable-item" : "gallery-item card h-100");
 
                                     <div class="col-md-3 col-sm-4 col-6 mb-3"
-                                         draggable="true"
-                                         @ondragstart="() => HandleImageDragStart(image, gallery)"
+                                         draggable="@IsAuthenticated"
+                                         @ondragstart="() => { if (IsAuthenticated) HandleImageDragStart(image, gallery); }"
                                          @ondragend="HandleImageDragEnd"
                                          @ondragover:preventDefault
-                                         @ondrop="() => HandleImageDrop(image, gallery)">
+                                         @ondrop="async () => { if (IsAuthenticated) await HandleImageDrop(image, gallery); }">
                                         <div class="@imageCardClass">
-                                            <img src="@image.ImageThumbnailUrl" alt="@image.AltText" class="card-img-top" />
-                                            <div class="card-body p-2">
-                                                @if (!string.IsNullOrEmpty(image.Title))
-                                                {
-                                                    <h6 class="card-title small mb-1">@image.Title</h6>
-                                                }
-                                                @if (!string.IsNullOrEmpty(image.Description))
-                                                {
-                                                    <p class="card-text small text-muted mb-0">@image.Description</p>
-                                                }
-                                            </div>
+                                            <img src="@image.ImageThumbnailUrl" alt="@image.AltText" class="card-img-top clickable-thumbnail" 
+                                                 draggable="false"
+                                                 @onclick="() => OpenLightbox(image, gallery)" 
+                                                 @onclick:stopPropagation="true"
+                                                 @ondragstart:preventDefault
+                                                 @ondragstart:stopPropagation />
                                             <CascadingAuthenticationState>
                                                 <AuthorizeView>
                                                     <Authorized Context="imageAuthContext">
@@ -222,3 +220,69 @@
         <p>No galleries found for type: @GalleryType</p>
     }
 </div>
+
+<!-- Fullscreen Lightbox Carousel -->
+@if (IsLightboxOpen && LightboxImages.Any())
+{
+    var currentImage = LightboxImages[LightboxCurrentIndex];
+    
+    <div class="lightbox-overlay" @onclick="CloseLightbox">
+        <div class="lightbox-container" @onclick:stopPropagation="true">
+            <!-- Close Button -->
+            <button type="button" class="lightbox-close" @onclick="CloseLightbox" aria-label="Close">
+                <span>&times;</span>
+            </button>
+            
+            <!-- Main Image Area -->
+            <div class="lightbox-main">
+                <!-- Previous Arrow -->
+                <button type="button" class="lightbox-nav lightbox-prev" @onclick="LightboxPrevious" aria-label="Previous">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                </button>
+                
+                <!-- Current Image -->
+                <div class="lightbox-image-wrapper">
+                    <img src="@currentImage.ImageUrl" alt="@currentImage.AltText" class="lightbox-image" />
+                    @if (!string.IsNullOrEmpty(currentImage.Title) || !string.IsNullOrEmpty(currentImage.Description))
+                    {
+                        <div class="lightbox-caption">
+                            @if (!string.IsNullOrEmpty(currentImage.Title))
+                            {
+                                <h5>@currentImage.Title</h5>
+                            }
+                            @if (!string.IsNullOrEmpty(currentImage.Description))
+                            {
+                                <p>@currentImage.Description</p>
+                            }
+                        </div>
+                    }
+                </div>
+                
+                <!-- Next Arrow -->
+                <button type="button" class="lightbox-nav lightbox-next" @onclick="LightboxNext" aria-label="Next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+            
+            <!-- Thumbnail Strip -->
+            <div class="lightbox-thumbnails">
+                @for (int i = 0; i < LightboxImages.Count; i++)
+                {
+                    var index = i;
+                    var thumbImage = LightboxImages[i];
+                    var thumbClass = i == LightboxCurrentIndex ? "lightbox-thumb active" : "lightbox-thumb";
+                    
+                    <img src="@thumbImage.ImageThumbnailUrl" 
+                         alt="@thumbImage.AltText" 
+                         class="@thumbClass" 
+                         @onclick="() => LightboxGoToIndex(index)" />
+                }
+            </div>
+            
+            <!-- Image Counter -->
+            <div class="lightbox-counter">
+                @(LightboxCurrentIndex + 1) / @LightboxImages.Count
+            </div>
+        </div>
+    </div>
+}

@@ -83,8 +83,49 @@ a {
 }
 
 .gallery-item {
-    border: 1px solid #ddd;
+    border: 1px solid var(--accordion-border);
     padding: 1rem;
     margin-bottom: 1rem;
     border-radius: 4px;
+}
+
+/* Accordion theming */
+.accordion-item {
+    background-color: var(--accordion-bg);
+    border-color: var(--accordion-border);
+}
+
+.accordion-button {
+    background-color: var(--accordion-btn-bg);
+    color: var(--accordion-btn-text);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--accordion-active-bg);
+    color: var(--accordion-active-text);
+}
+
+.accordion-button:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--accent-color), 0.25);
+}
+
+.accordion-button::after {
+    filter: var(--accordion-icon-filter, none);
+}
+
+.accordion-body {
+    background-color: var(--accordion-body-bg);
+    color: var(--primary-text);
+}
+
+/* Dark theme accordion icon fix */
+.theme-dark .accordion-button::after,
+:root .accordion-button::after {
+    filter: invert(1);
+}
+
+.theme-dark .accordion-button:not(.collapsed)::after,
+:root .accordion-button:not(.collapsed)::after {
+    filter: invert(0.5) sepia(1) saturate(5) hue-rotate(190deg);
 }

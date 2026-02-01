@@ -11,17 +11,28 @@
 
     <main>
         <div class="top-row px-4 d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-                <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-                <ThemeSelector />
-            </div>
-            <LoginDisplay />
         </div>
 
         <article class="content px-4">
             @Body
         </article>
     </main>
+</div>
+
+<!-- Mobile bottom bar -->
+<div class="mobile-bottom-bar">
+    <input type="checkbox" id="mobile-settings-toggle" class="mobile-settings-toggle" />
+    <label for="mobile-settings-toggle" class="mobile-settings-button">
+        <span class="settings-icon">&#x2699;</span>
+    </label>
+    <div class="mobile-settings-panel">
+        <div class="mobile-settings-item">
+            <ThemeSelector />
+        </div>
+        <div class="mobile-settings-item">
+            <LoginDisplay />
+        </div>
+    </div>
 </div>
 
 <div id="blazor-error-ui">

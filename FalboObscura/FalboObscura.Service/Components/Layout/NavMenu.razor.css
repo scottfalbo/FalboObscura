@@ -89,7 +89,33 @@
     display: block;
 }
 
-@media (min-width: 641px) {
+/* Sidebar bottom section for theme selector and login */
+.sidebar-bottom {
+    display: none;
+}
+
+.sidebar-bottom-item {
+    padding: 0.5rem 0;
+}
+
+.sidebar-bottom-item ::deep a {
+    color: #d7d7d7;
+    text-decoration: none;
+}
+
+.sidebar-bottom-item ::deep a:hover {
+    color: white;
+}
+
+.sidebar-bottom-item ::deep select {
+    background-color: rgba(255,255,255,0.1);
+    color: #d7d7d7;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+}
+
+@media (min-width: 1024px) {
     .navbar-toggler {
         display: none;
     }
@@ -98,7 +124,17 @@
         /* Never collapse the sidebar for wide screens */
         display: block;
         /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
+        height: calc(100vh - 3.5rem - 120px);
         overflow-y: auto;
+    }
+    
+    .sidebar-bottom {
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding-bottom: 1rem;
+        background-color: rgba(0,0,0,0.2);
     }
 }

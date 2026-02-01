@@ -5,6 +5,7 @@
 using FalboObscura.Core.Models;
 using FalboObscura.Core.Processors;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace FalboObscura.Components.Pages.Shared;
@@ -17,6 +18,11 @@ public partial class GalleryViewer : ComponentBase
 
     [Inject]
     public IGalleryProcessor? GalleryProcessor { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthStateTask { get; set; }
+
+    private bool IsAuthenticated { get; set; } = false;
 
     [Parameter]
     public string GalleryType { get; set; } = string.Empty;
@@ -41,11 +47,25 @@ public partial class GalleryViewer : ComponentBase
     private GalleryImage? DraggedImage { get; set; }
     private Guid? DraggedImageGalleryId { get; set; }
 
+    // Lightbox carousel state
+    private bool IsLightboxOpen { get; set; } = false;
+    private Gallery? LightboxGallery { get; set; }
+    private int LightboxCurrentIndex { get; set; } = 0;
+    private List<GalleryImage> LightboxImages { get; set; } = [];
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender && !_hasRendered)
         {
             _hasRendered = true;
+            
+            // Check authentication state
+            if (AuthStateTask != null)
+            {
+                var authState = await AuthStateTask;
+                IsAuthenticated = authState.User?.Identity?.IsAuthenticated ?? false;
+            }
+            
             await LoadGalleries();
         }
     }
@@ -328,6 +348,48 @@ public partial class GalleryViewer : ComponentBase
             DraggedImage = null;
             DraggedImageGalleryId = null;
             IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OpenLightbox(GalleryImage image, Gallery gallery)
+    {
+        LightboxGallery = gallery;
+        LightboxImages = gallery.GalleryImages.OrderBy(i => i.Order).ToList();
+        LightboxCurrentIndex = LightboxImages.FindIndex(i => i.Id == image.Id);
+        if (LightboxCurrentIndex < 0) LightboxCurrentIndex = 0;
+        IsLightboxOpen = true;
+        StateHasChanged();
+    }
+
+    private void CloseLightbox()
+    {
+        IsLightboxOpen = false;
+        LightboxGallery = null;
+        LightboxImages = [];
+        LightboxCurrentIndex = 0;
+        StateHasChanged();
+    }
+
+    private void LightboxPrevious()
+    {
+        if (LightboxImages.Count == 0) return;
+        LightboxCurrentIndex = (LightboxCurrentIndex - 1 + LightboxImages.Count) % LightboxImages.Count;
+        StateHasChanged();
+    }
+
+    private void LightboxNext()
+    {
+        if (LightboxImages.Count == 0) return;
+        LightboxCurrentIndex = (LightboxCurrentIndex + 1) % LightboxImages.Count;
+        StateHasChanged();
+    }
+
+    private void LightboxGoToIndex(int index)
+    {
+        if (index >= 0 && index < LightboxImages.Count)
+        {
+            LightboxCurrentIndex = index;
             StateHasChanged();
         }
     }

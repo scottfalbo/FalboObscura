@@ -4,6 +4,14 @@
 
 namespace GameBox.PlagueDoctor.Data;
 
+public enum GamePhase
+{
+    Playing,        // Normal pill control
+    Clearing,       // Matches found, showing cleared cells
+    Dropping,       // Gravity is being applied
+    Checking        // Checking for chain reactions
+}
+
 public class PlagueService
 {
     private readonly Random _random = new();
@@ -12,6 +20,9 @@ public class PlagueService
     public GameState State { get; private set; } = new();
     public Pill? CurrentPill { get; private set; }
     public Pill? NextPill { get; private set; }
+    public GamePhase Phase { get; private set; } = GamePhase.Playing;
+    
+    private int _comboMultiplier = 1;
 
     public event Action? OnStateChanged;
 
@@ -138,19 +149,32 @@ public class PlagueService
     {
         if (CurrentPill == null || State.Status != GameStatus.Playing) return false;
 
-        var newPill = ClonePill(CurrentPill);
-        newPill.RotateClockwise();
+        // DEBUG: Always rotate to test if the swap works
+        CurrentPill.RotateClockwise();
+        NotifyStateChanged();
+        return true;
+    }
 
-        if (CanMove(newPill))
+    public bool RotateClockwise_WithCollision()
+    {
+        if (CurrentPill == null || State.Status != GameStatus.Playing) return false;
+
+        var testPill = ClonePill(CurrentPill);
+        testPill.RotateClockwise();
+
+        // Try rotation in place
+        if (CanMove(testPill))
         {
             CurrentPill.RotateClockwise();
             NotifyStateChanged();
             return true;
         }
 
-        // Try wall kick - move left or right if rotation is blocked
-        newPill.Y--;
-        if (CanMove(newPill))
+        // Try wall kick LEFT
+        testPill = ClonePill(CurrentPill);
+        testPill.RotateClockwise();
+        testPill.Y--;
+        if (CanMove(testPill))
         {
             CurrentPill.Y--;
             CurrentPill.RotateClockwise();
@@ -158,10 +182,25 @@ public class PlagueService
             return true;
         }
 
-        newPill.Y += 2;
-        if (CanMove(newPill))
+        // Try wall kick RIGHT
+        testPill = ClonePill(CurrentPill);
+        testPill.RotateClockwise();
+        testPill.Y++;
+        if (CanMove(testPill))
         {
             CurrentPill.Y++;
+            CurrentPill.RotateClockwise();
+            NotifyStateChanged();
+            return true;
+        }
+
+        // Try floor kick UP (for rotating near bottom or when cell below is occupied)
+        testPill = ClonePill(CurrentPill);
+        testPill.RotateClockwise();
+        testPill.X--;
+        if (CanMove(testPill))
+        {
+            CurrentPill.X--;
             CurrentPill.RotateClockwise();
             NotifyStateChanged();
             return true;
@@ -174,11 +213,48 @@ public class PlagueService
     {
         if (CurrentPill == null || State.Status != GameStatus.Playing) return false;
 
-        var newPill = ClonePill(CurrentPill);
-        newPill.RotateCounterClockwise();
+        var testPill = ClonePill(CurrentPill);
+        testPill.RotateCounterClockwise();
 
-        if (CanMove(newPill))
+        // Try rotation in place
+        if (CanMove(testPill))
         {
+            CurrentPill.RotateCounterClockwise();
+            NotifyStateChanged();
+            return true;
+        }
+
+        // Try wall kick LEFT
+        testPill = ClonePill(CurrentPill);
+        testPill.RotateCounterClockwise();
+        testPill.Y--;
+        if (CanMove(testPill))
+        {
+            CurrentPill.Y--;
+            CurrentPill.RotateCounterClockwise();
+            NotifyStateChanged();
+            return true;
+        }
+
+        // Try wall kick RIGHT
+        testPill = ClonePill(CurrentPill);
+        testPill.RotateCounterClockwise();
+        testPill.Y++;
+        if (CanMove(testPill))
+        {
+            CurrentPill.Y++;
+            CurrentPill.RotateCounterClockwise();
+            NotifyStateChanged();
+            return true;
+        }
+
+        // Try floor kick UP
+        testPill = ClonePill(CurrentPill);
+        testPill.RotateCounterClockwise();
+        testPill.X--;
+        if (CanMove(testPill))
+        {
+            CurrentPill.X--;
             CurrentPill.RotateCounterClockwise();
             NotifyStateChanged();
             return true;
@@ -202,8 +278,52 @@ public class PlagueService
         if (CurrentPill == null) return;
 
         Board.PlacePill(CurrentPill);
-        ProcessMatches();
+        CurrentPill = null;  // Clear current pill while processing
+        _comboMultiplier = 1;
+        
+        // Start the match/clear/drop cycle
+        StartMatchPhase();
+    }
 
+    private void StartMatchPhase()
+    {
+        var matches = Board.FindMatches();
+        if (matches.Count > 0)
+        {
+            int virusesCleared = Board.ClearMatches(matches);
+            State.AddScore(virusesCleared, _comboMultiplier);
+            _comboMultiplier++;
+            Phase = GamePhase.Dropping;
+            NotifyStateChanged();
+        }
+        else
+        {
+            // No matches, finish up and spawn next pill
+            FinishTurn();
+        }
+    }
+
+    /// <summary>
+    /// Called by the game loop timer during Dropping phase to animate gravity
+    /// </summary>
+    public void ProcessDropping()
+    {
+        if (Phase != GamePhase.Dropping) return;
+
+        bool anythingFell = Board.ApplyGravity();
+        NotifyStateChanged();
+
+        if (!anythingFell)
+        {
+            // Nothing left to fall, check for chain reactions
+            Phase = GamePhase.Checking;
+            StartMatchPhase();  // Check for new matches after gravity
+        }
+    }
+
+    private void FinishTurn()
+    {
+        Phase = GamePhase.Playing;
         State.CheckVictory(Board.CountViruses());
 
         if (State.Status == GameStatus.Playing)
@@ -214,28 +334,15 @@ public class PlagueService
         NotifyStateChanged();
     }
 
-    private void ProcessMatches()
-    {
-        int comboMultiplier = 1;
-
-        while (true)
-        {
-            var matches = Board.FindMatches();
-            if (matches.Count == 0) break;
-
-            int virusesCleared = Board.ClearMatches(matches);
-            State.AddScore(virusesCleared, comboMultiplier);
-
-            // Apply gravity and check for chain reactions
-            while (Board.ApplyGravity()) { }
-
-            comboMultiplier++;
-        }
-    }
-
     public void Tick()
     {
-        if (State.Status == GameStatus.Playing)
+        if (State.Status != GameStatus.Playing) return;
+
+        if (Phase == GamePhase.Dropping)
+        {
+            ProcessDropping();
+        }
+        else if (Phase == GamePhase.Playing)
         {
             MoveDown();
         }

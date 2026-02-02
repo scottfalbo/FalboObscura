@@ -64,11 +64,11 @@ public class BoardGrid
     {
         var (x2, y2) = pill.SecondHalfPosition;
 
-        var half1 = CellContent.CreatePillHalf(pill.Color1);
-        var half2 = CellContent.CreatePillHalf(pill.Color2);
+        var half1 = CellContent.CreatePillHalf(pill.AnchorColor);
+        var half2 = CellContent.CreatePillHalf(pill.SecondColor);
 
         // Set connection flags based on orientation
-        if (pill.Orientation == PillOrientation.Horizontal)
+        if (pill.IsHorizontal)
         {
             half1.IsConnectedRight = true;
             half2.IsConnectedLeft = true;
@@ -225,7 +225,45 @@ public class BoardGrid
             for (int col = 0; col < Columns; col++)
             {
                 var cell = Cells[row, col];
-                if (cell.IsPillHalf && !HasConnection(row, col) && IsCellEmpty(row + 1, col))
+                if (!cell.IsPillHalf) continue;
+
+                // Check if this is a horizontally connected pill
+                if (cell.IsConnectedRight && col + 1 < Columns)
+                {
+                    // This is the left half of a horizontal pill - check if both can fall
+                    if (IsCellEmpty(row + 1, col) && IsCellEmpty(row + 1, col + 1))
+                    {
+                        var rightCell = Cells[row, col + 1];
+                        Cells[row + 1, col] = cell;
+                        Cells[row + 1, col + 1] = rightCell;
+                        Cells[row, col] = CellContent.Empty();
+                        Cells[row, col + 1] = CellContent.Empty();
+                        anythingFell = true;
+                    }
+                }
+                else if (cell.IsConnectedLeft)
+                {
+                    // This is the right half - skip, handled by left half
+                    continue;
+                }
+                else if (cell.IsConnectedDown && row + 1 < Rows)
+                {
+                    // This is the top half of a vertical pill - check if bottom can fall
+                    var bottomCell = Cells[row + 1, col];
+                    if (row + 2 < Rows && IsCellEmpty(row + 2, col))
+                    {
+                        Cells[row + 2, col] = bottomCell;
+                        Cells[row + 1, col] = cell;
+                        Cells[row, col] = CellContent.Empty();
+                        anythingFell = true;
+                    }
+                }
+                else if (cell.IsConnectedUp)
+                {
+                    // This is the bottom half - skip, handled by top half
+                    continue;
+                }
+                else if (IsCellEmpty(row + 1, col))
                 {
                     // Single unconnected pill half falls
                     Cells[row + 1, col] = cell;
@@ -236,13 +274,6 @@ public class BoardGrid
         }
 
         return anythingFell;
-    }
-
-    private bool HasConnection(int row, int col)
-    {
-        var cell = Cells[row, col];
-        return cell.IsConnectedLeft || cell.IsConnectedRight ||
-               cell.IsConnectedUp || cell.IsConnectedDown;
     }
 
     public int CountViruses()

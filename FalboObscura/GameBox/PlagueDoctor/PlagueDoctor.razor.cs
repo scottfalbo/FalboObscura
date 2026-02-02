@@ -78,10 +78,14 @@ public partial class PlagueDoctor : ComponentBase, IDisposable
             PlagueService.Tick();
             StateHasChanged();
 
-            // Adjust speed if needed
-            if (gameTimer != null && gameTimer.Interval != PlagueService.State.FallSpeed)
+            // Use faster tick during dropping phase for smooth animation
+            int targetSpeed = PlagueService.Phase == GamePhase.Dropping 
+                ? 50  // Fast gravity animation
+                : PlagueService.State.FallSpeed;
+
+            if (gameTimer != null && gameTimer.Interval != targetSpeed)
             {
-                gameTimer.Interval = PlagueService.State.FallSpeed;
+                gameTimer.Interval = targetSpeed;
             }
 
             // Stop if game ended
@@ -102,7 +106,23 @@ public partial class PlagueDoctor : ComponentBase, IDisposable
 
     private void HandleKeyDown(KeyboardEventArgs e)
     {
+        // Handle pause/resume regardless of game phase
+        if (e.Key == "p" || e.Key == "P" || e.Key == "Escape")
+        {
+            if (PlagueService.State.Status == GameStatus.Playing)
+            {
+                PauseGame();
+                return;
+            }
+            else if (PlagueService.State.Status == GameStatus.Paused)
+            {
+                ResumeGame();
+                return;
+            }
+        }
+
         if (PlagueService.State.Status != GameStatus.Playing) return;
+        if (PlagueService.Phase != GamePhase.Playing) return;  // Block input during clear/drop
 
         switch (e.Key)
         {
@@ -153,16 +173,18 @@ public partial class PlagueDoctor : ComponentBase, IDisposable
 
             if (pill.X == row && pill.Y == col)
             {
-                classes.Add(GetColorClass(pill.Color1));
-                if (pill.Orientation == PillOrientation.Horizontal)
+                // Anchor position - use AnchorColor
+                classes.Add(GetColorClass(pill.AnchorColor));
+                if (pill.IsHorizontal)
                     classes.Add("connected-right");
                 else
                     classes.Add("connected-down");
             }
             else
             {
-                classes.Add(GetColorClass(pill.Color2));
-                if (pill.Orientation == PillOrientation.Horizontal)
+                // Second position - use SecondColor
+                classes.Add(GetColorClass(pill.SecondColor));
+                if (pill.IsHorizontal)
                     classes.Add("connected-left");
                 else
                     classes.Add("connected-up");

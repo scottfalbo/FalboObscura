@@ -8,6 +8,12 @@
             <span>Level: @PlagueService.State.Level</span>
             <span>Viruses: @PlagueService.State.VirusesRemaining</span>
         </div>
+        @if (PlagueService.CurrentPill != null)
+        {
+            <div style="background: black; color: lime; padding: 5px; margin-top: 5px;">
+                DEBUG: @PlagueService.CurrentPill.Orientation - Anchor:@PlagueService.CurrentPill.AnchorColor / Second:@PlagueService.CurrentPill.SecondColor
+            </div>
+        }
     </div>
 
     <div class="game-area">
@@ -76,6 +82,6 @@
     </div>
 
     <div class="controls-help">
-        <p>← → Move | ↓ Drop | Z/X Rotate | Space Hard Drop</p>
+        <p>← → Move | ↓ Drop | Z/X Rotate | Space Hard Drop | P Pause</p>
     </div>
 </div>

@@ -1,0 +1,90 @@
+﻿@page "/gamebox"
+@rendermode InteractiveServer
+@using global::GameBox.BlockGame
+
+<h3>GameBox</h3>
+
+<div class="game-menu">
+    <button @onclick="() => OpenGame(nameof(GameBoard))">Block Puzzle</button>
+</div>
+
+@if (!string.IsNullOrEmpty(selectedGame))
+{
+    <div class="game-overlay">
+        <div class="game-container">
+            <button class="close-button" @onclick="CloseGame">✕</button>
+            <div class="game-content">
+                @if (selectedGame == nameof(GameBoard))
+                {
+                    <GameBoard />
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .game-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .game-container {
+        position: relative;
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 90vw;
+        max-height: 90vh;
+        overflow: auto;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .close-button:hover {
+        background: #c82333;
+    }
+
+    .game-content {
+        margin-top: 20px;
+    }
+</style>
+
+@code {
+    private string? selectedGame;
+
+    private void OpenGame(string gameName)
+    {
+        selectedGame = gameName;
+    }
+
+    private void CloseGame()
+    {
+        selectedGame = null;
+    }
+}
+
+

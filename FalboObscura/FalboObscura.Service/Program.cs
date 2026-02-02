@@ -39,6 +39,10 @@ builder.Services.AddRazorPages();
 // Register theme service as scoped (required for IJSRuntime dependency)
 builder.Services.AddScoped<IThemeService, ThemeService>();
 
+// Register GameBox services
+builder.Services.AddScoped<GameBox.BlockGame.Data.GameService>();
+builder.Services.AddScoped<GameBox.BlockGame.Data.LoadImageService>();
+
 // Configure file upload limits
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {

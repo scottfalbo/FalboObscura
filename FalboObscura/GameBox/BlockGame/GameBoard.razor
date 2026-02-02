@@ -1,0 +1,34 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+
+<div class="gameboard">
+    <table>
+        @foreach (var rows in Puzzle.Rows)
+        {
+            <tr>
+                @foreach (var cell in rows.Cells)
+                {
+
+                    <td class="game-cell">
+                        @if (cell != null)
+                        {
+                            <button class="cell-button" @onclick="() => ClickCell(cell.X, cell.Y)">
+                                <img src="@cell.ImageUrl" />
+                            </button>
+                        }
+                    </td>
+
+                }
+            </tr>
+        }
+    </table>
+</div>
+
+<h4>Number of Moves: @NumberOfMoves</h4>
+@if (Winner)
+{
+    <h3>You Won!</h3>
+}
+
+@* <h4>Load Image</h4>
+
+<InputFile OnChange="@LoadFile"></InputFile> *@

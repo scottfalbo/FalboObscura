@@ -1,0 +1,55 @@
+﻿* {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.gameboard {
+    border: 3px solid #000;
+    width: fit-content;
+}
+
+.game-cell {
+    background-color: #000;
+    width: 60px;
+    height: 60px;
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.cell-button {
+    width: 60px;
+    height: 60px;
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.cell-button img {
+    width: 60px;
+    height: 60px;
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+tr {
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    line-height: 0;
+}

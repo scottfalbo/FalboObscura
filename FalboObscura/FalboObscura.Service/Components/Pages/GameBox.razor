@@ -1,11 +1,13 @@
 ﻿@page "/gamebox"
 @rendermode InteractiveServer
 @using global::GameBox.BlockGame
+@using global::GameBox.PlagueDoctor
 
 <h3>Game Box</h3>
 
 <div class="game-menu">
     <button @onclick="() => OpenGame(nameof(GameBoard))">Block Puzzle</button>
+    <button @onclick="() => OpenGame(nameof(PlagueDoctor))">Plague Doctor</button>
 </div>
 
 @if (!string.IsNullOrEmpty(selectedGame))
@@ -17,6 +19,10 @@
                 @if (selectedGame == nameof(GameBoard))
                 {
                     <GameBoard />
+                }
+                else if (selectedGame == nameof(PlagueDoctor))
+                {
+                    <PlagueDoctor />
                 }
             </div>
         </div>

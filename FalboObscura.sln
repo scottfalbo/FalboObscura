@@ -5,8 +5,6 @@ VisualStudioVersion = 18.3.11426.168 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FalboObscura", "FalboObscura\FalboObscura.Service\FalboObscura.csproj", "{69FA19A1-F9F6-A346-0D8F-484D93E38E53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FalboObscura.UnitTests", "FalboObscura\FalboObscura.UnitTests\FalboObscura.UnitTests.csproj", "{52C1061F-2257-4729-E44D-EC076516F111}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameBox", "FalboObscura\GameBox\GameBox.csproj", "{DC539A76-900B-4B82-BDC3-5696611D13AB}"
 EndProject
 Global
@@ -31,18 +29,6 @@ Global
 		{69FA19A1-F9F6-A346-0D8F-484D93E38E53}.Release|x64.Build.0 = Release|Any CPU
 		{69FA19A1-F9F6-A346-0D8F-484D93E38E53}.Release|x86.ActiveCfg = Release|Any CPU
 		{69FA19A1-F9F6-A346-0D8F-484D93E38E53}.Release|x86.Build.0 = Release|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Debug|x64.Build.0 = Debug|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Debug|x86.Build.0 = Debug|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Release|x64.ActiveCfg = Release|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Release|x64.Build.0 = Release|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Release|x86.ActiveCfg = Release|Any CPU
-		{52C1061F-2257-4729-E44D-EC076516F111}.Release|x86.Build.0 = Release|Any CPU
 		{DC539A76-900B-4B82-BDC3-5696611D13AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DC539A76-900B-4B82-BDC3-5696611D13AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC539A76-900B-4B82-BDC3-5696611D13AB}.Debug|x64.ActiveCfg = Debug|Any CPU

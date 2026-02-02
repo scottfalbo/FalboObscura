@@ -1,0 +1,208 @@
+.plague-doctor-game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Segoe UI', sans-serif;
+    color: #fff;
+}
+
+.game-header {
+    margin-bottom: 20px;
+}
+
+.score-display {
+    display: flex;
+    gap: 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.game-area {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.next-pill-preview {
+    background: #2a2a4a;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.next-pill-preview h4 {
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.preview-pill {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+}
+
+.preview-pill .pill-half {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.bottle-container {
+    outline: none;
+}
+
+.bottle-container:focus {
+    outline: 2px solid #6366f1;
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+.bottle {
+    display: grid;
+    grid-template-columns: repeat(8, 32px);
+    grid-template-rows: repeat(16, 32px);
+    gap: 1px;
+    background: #1a1a2e;
+    border: 4px solid #4a4a6a;
+    border-radius: 0 0 12px 12px;
+    padding: 2px;
+    position: relative;
+}
+
+/* Bottle neck effect */
+.bottle::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 20px;
+    background: #1a1a2e;
+    border: 4px solid #4a4a6a;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+}
+
+.cell {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 2px;
+}
+
+/* Colors */
+.color-red {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a5a) !important;
+    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 107, 107, 0.4);
+}
+
+.color-blue {
+    background: linear-gradient(135deg, #4dabf7, #339af0) !important;
+    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(77, 171, 247, 0.4);
+}
+
+.color-yellow {
+    background: linear-gradient(135deg, #ffd43b, #fab005) !important;
+    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 212, 59, 0.4);
+}
+
+/* Virus styling */
+.virus {
+    border-radius: 6px !important;
+    animation: virus-wiggle 0.5s ease-in-out infinite alternate;
+}
+
+.virus-face {
+    font-size: 18px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes virus-wiggle {
+    from {
+        transform: rotate(-5deg);
+    }
+    to {
+        transform: rotate(5deg);
+    }
+}
+
+/* Pill styling */
+.pill-half {
+    border-radius: 50%;
+    transition: all 0.05s ease;
+}
+
+/* Connection styling - make pills look connected */
+.connected-right {
+    border-radius: 50% 4px 4px 50% !important;
+}
+
+.connected-left {
+    border-radius: 4px 50% 50% 4px !important;
+}
+
+.connected-down {
+    border-radius: 50% 50% 4px 4px !important;
+}
+
+.connected-up {
+    border-radius: 4px 4px 50% 50% !important;
+}
+
+/* Game controls */
+.game-controls {
+    margin-top: 20px;
+}
+
+.game-btn {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.game-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.game-btn:active {
+    transform: translateY(0);
+}
+
+.game-over,
+.victory {
+    text-align: center;
+}
+
+.game-over h3 {
+    color: #ff6b6b;
+    margin-bottom: 10px;
+}
+
+.victory h3 {
+    color: #51cf66;
+    margin-bottom: 10px;
+}
+
+.controls-help {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.controls-help p {
+    margin: 0;
+}

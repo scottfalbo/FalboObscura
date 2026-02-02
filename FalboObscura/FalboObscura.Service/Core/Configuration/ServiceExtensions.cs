@@ -96,5 +96,9 @@ public static class ServiceExtensions
         builder.Services.AddTransient<IGalleryRepository, GalleryRepository>();
         builder.Services.AddTransient<IBlobStorageClient, BlobStorageClient>();
         builder.Services.AddTransient<IBlobStorageProcessor, BlobStorageProcessor>();
+
+        // Register GameBox services
+        builder.Services.AddScoped<GameBox.BlockGame.Data.GameService>();
+        builder.Services.AddScoped<GameBox.PlagueDoctor.Data.PlagueService>();
     }
 }

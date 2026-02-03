@@ -31,39 +31,46 @@
             </div>
 
             <div class="game-controls">
-                @if (PlagueService.State.Status == GameStatus.NotStarted)
-                {
-                    <div class="game-options">
+                <div class="game-options">
+                    <div class="option-group">
+                        <label>Game Type</label>
+                        <div class="option-buttons">
+                            <button class="option-btn @(selectedGameType == GameType.TypeA ? "active" : "")" 
+                                    @onclick="() => selectedGameType = GameType.TypeA">A</button>
+                            <button class="option-btn @(selectedGameType == GameType.TypeB ? "active" : "")" 
+                                    @onclick="() => selectedGameType = GameType.TypeB">B</button>
+                        </div>
+                    </div>
+
+                    @if (selectedGameType == GameType.TypeA)
+                    {
                         <div class="option-group">
-                            <label>Game Type</label>
+                            <label>Level: @(PlagueService.State.Level + 1)</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="option-group">
+                            <label>Speed</label>
                             <div class="option-buttons">
-                                <button class="option-btn @(selectedGameType == GameType.TypeA ? "active" : "")" 
-                                        @onclick="() => selectedGameType = GameType.TypeA">A</button>
-                                <button class="option-btn @(selectedGameType == GameType.TypeB ? "active" : "")" 
-                                        @onclick="() => selectedGameType = GameType.TypeB">B</button>
+                                <button class="option-btn @(selectedSpeed == SpeedSetting.Low ? "active" : "")" 
+                                        @onclick="() => selectedSpeed = SpeedSetting.Low">Low</button>
+                                <button class="option-btn @(selectedSpeed == SpeedSetting.Medium ? "active" : "")" 
+                                        @onclick="() => selectedSpeed = SpeedSetting.Medium">Med</button>
+                                <button class="option-btn @(selectedSpeed == SpeedSetting.High ? "active" : "")" 
+                                        @onclick="() => selectedSpeed = SpeedSetting.High">Hi</button>
                             </div>
                         </div>
 
-                        @if (selectedGameType == GameType.TypeB)
-                        {
-                            <div class="option-group">
-                                <label>Speed</label>
-                                <div class="option-buttons">
-                                    <button class="option-btn @(selectedSpeed == SpeedSetting.Low ? "active" : "")" 
-                                            @onclick="() => selectedSpeed = SpeedSetting.Low">Low</button>
-                                    <button class="option-btn @(selectedSpeed == SpeedSetting.Medium ? "active" : "")" 
-                                            @onclick="() => selectedSpeed = SpeedSetting.Medium">Med</button>
-                                    <button class="option-btn @(selectedSpeed == SpeedSetting.High ? "active" : "")" 
-                                            @onclick="() => selectedSpeed = SpeedSetting.High">Hi</button>
-                                </div>
-                            </div>
+                        <div class="option-group">
+                            <label>Viruses: @((selectedVirusLevel + 1) * 4)</label>
+                            <input type="range" min="0" max="20" @bind="selectedVirusLevel" @bind:event="oninput" />
+                        </div>
+                    }
+                </div>
 
-                            <div class="option-group">
-                                <label>Viruses: @((selectedVirusLevel + 1) * 4)</label>
-                                <input type="range" min="0" max="20" @bind="selectedVirusLevel" @bind:event="oninput" />
-                            </div>
-                        }
-                    </div>
+                @if (PlagueService.State.Status == GameStatus.NotStarted)
+                {
                     <button class="game-btn" @onclick="StartGame">Start Game</button>
                 }
                 else if (PlagueService.State.Status == GameStatus.GameOver)
@@ -71,8 +78,8 @@
                     <div class="game-over">
                         <h3>Game Over!</h3>
                         <p>Final Score: @PlagueService.State.Score</p>
-                        <button class="game-btn" @onclick="StartGame">Play Again</button>
                     </div>
+                    <button class="game-btn" @onclick="StartGame">New Game</button>
                 }
                 else if (PlagueService.State.Status == GameStatus.Victory)
                 {
@@ -86,9 +93,9 @@
                         {
                             <h3>You Win!</h3>
                             <p>Final Score: @PlagueService.State.Score</p>
-                            <button class="game-btn" @onclick="StartGame">Play Again</button>
                         }
                     </div>
+                    <button class="game-btn" @onclick="StartGame">New Game</button>
                 }
                 else if (PlagueService.State.Status == GameStatus.Paused)
                 {

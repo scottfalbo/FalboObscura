@@ -46,10 +46,10 @@ public class GameState
         ? Math.Max(100, 800 - (Level * 30))
         : SelectedSpeed switch
         {
-            SpeedSetting.Low => 700,
-            SpeedSetting.Medium => 450,
-            SpeedSetting.High => 200,
-            _ => 450
+            SpeedSetting.Low => 900,
+            SpeedSetting.Medium => 600,
+            SpeedSetting.High => 350,
+            _ => 600
         };
 
     /// <summary>

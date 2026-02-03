@@ -84,9 +84,7 @@
 }
 
 .bottle-container:focus {
-    outline: 2px solid #6366f1;
-    outline-offset: 4px;
-    border-radius: 4px;
+    outline: none;
 }
 
 .bottle {
@@ -157,8 +155,8 @@
 }
 
 @keyframes virus-wiggle {
-    0%, 100% { transform: rotate(-2deg); }
-    50% { transform: rotate(2deg); }
+    0%, 100% { transform: rotate(-1deg); }
+    50% { transform: rotate(1deg); }
 }
 
 /* Pill styling */

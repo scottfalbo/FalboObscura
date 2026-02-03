@@ -15,19 +15,24 @@ public partial class GameBoard : ComponentBase
     [Inject] private LoadImageService LoadImageService { get; set; }
 
     private Puzzle Puzzle;
-    private int X;
-    private int Y;
+    private int X = 7;
+    private int Y = 4;
     private GameCell RemovedCell;
     private bool Winner;
     private int NumberOfMoves;
 
     protected override void OnInitialized()
     {
+        InitializeGame();
+    }
+
+    private void InitializeGame()
+    {
+        if (GameService == null) return;
+        
         Winner = false;
         NumberOfMoves = 0;
-        X = 7;
-        Y = 4;
-        Puzzle = GameService!.CreateBoard(X, Y);
+        Puzzle = GameService.CreateBoard(X, Y);
         RemovedCell = Puzzle.Rows[X - 1].Cells[Y - 1];
         Puzzle.Rows[X - 1].Cells[Y - 1] = null;
         Puzzle = GameService.RandomizeBoard(Puzzle, X, Y);

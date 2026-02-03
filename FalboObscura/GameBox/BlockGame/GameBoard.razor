@@ -1,33 +1,44 @@
 ﻿@using Microsoft.AspNetCore.Components.Forms
 
-<div class="gameboard">
-    <table>
-        @foreach (var rows in Puzzle.Rows)
+<div class="block-game-container">
+    <div class="gameboard">
+        @if (Puzzle != null && Puzzle.Rows != null)
         {
-            <tr>
-                @foreach (var cell in rows.Cells)
+            <table>
+                @foreach (var rows in Puzzle.Rows)
                 {
-
-                    <td class="game-cell">
-                        @if (cell != null)
+                    <tr>
+                        @foreach (var cell in rows.Cells)
                         {
-                            <button class="cell-button" @onclick="() => ClickCell(cell.X, cell.Y)">
-                                <img src="@cell.ImageUrl" />
-                            </button>
+
+                            <td class="game-cell">
+                                @if (cell != null)
+                                {
+                                    <button class="cell-button" @onclick="() => ClickCell(cell.X, cell.Y)">
+                                        <img src="@cell.ImageUrl" />
+                                    </button>
+                                }
+                            </td>
+
                         }
-                    </td>
-
+                    </tr>
                 }
-            </tr>
+            </table>
         }
-    </table>
-</div>
+        else
+        {
+            <p>Loading...</p>
+        }
+    </div>
 
-<h4>Number of Moves: @NumberOfMoves</h4>
-@if (Winner)
-{
-    <h3>You Won!</h3>
-}
+    <div class="game-info">
+        <h4>Number of Moves: @NumberOfMoves</h4>
+        @if (Winner)
+        {
+            <h3 class="winner-text">You Won!</h3>
+        }
+    </div>
+</div>
 
 @* <h4>Load Image</h4>
 

@@ -6,9 +6,9 @@ namespace GameBox.PlagueDoctor.Data;
 
 public enum PillColor
 {
-    Red,
-    Blue,
-    Yellow
+    Orange,
+    Lavender,
+    Mint
 }
 
 public enum CellContentType

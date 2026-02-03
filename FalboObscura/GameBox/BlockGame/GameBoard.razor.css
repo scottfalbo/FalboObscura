@@ -4,6 +4,15 @@
     user-select: none;
 }
 
+.block-game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
 .gameboard {
     border: 3px solid #000;
     width: fit-content;
@@ -11,8 +20,8 @@
 
 .game-cell {
     background-color: #000;
-    width: 60px;
-    height: 60px;
+    width: clamp(40px, 10vw, 80px);
+    height: clamp(40px, 10vw, 80px);
     vertical-align: baseline;
     margin: 0;
     padding: 0;
@@ -20,17 +29,18 @@
 }
 
 .cell-button {
-    width: 60px;
-    height: 60px;
+    width: clamp(40px, 10vw, 80px);
+    height: clamp(40px, 10vw, 80px);
     vertical-align: baseline;
     margin: 0;
     padding: 0;
     border: 0;
+    cursor: pointer;
 }
 
 .cell-button img {
-    width: 60px;
-    height: 60px;
+    width: clamp(40px, 10vw, 80px);
+    height: clamp(40px, 10vw, 80px);
     vertical-align: baseline;
     margin: 0;
     padding: 0;
@@ -52,4 +62,20 @@ tr {
     padding: 0;
     border: 0;
     line-height: 0;
+}
+
+.game-info {
+    text-align: center;
+    margin-top: 15px;
+    color: #333;
+}
+
+.game-info h4 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.winner-text {
+    color: #28a745;
+    margin-top: 10px;
 }

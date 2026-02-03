@@ -15,27 +15,30 @@
     position: relative;
     background: white;
     border-radius: 12px;
-    padding: 30px;
-    max-width: 90vw;
-    max-height: 90vh;
-    overflow: auto;
+    padding: 10px;
+    max-width: 95vw;
+    height: 95vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .close-button {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 32px;
-    height: 32px;
+    top: 5px;
+    right: 5px;
+    width: 28px;
+    height: 28px;
     border: none;
     background: #dc3545;
     color: white;
     border-radius: 50%;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 10;
 }
 
 .close-button:hover {
@@ -43,5 +46,9 @@
 }
 
 .game-content {
-    margin-top: 20px;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 }

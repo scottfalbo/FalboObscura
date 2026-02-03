@@ -17,6 +17,11 @@ public partial class PlagueDoctor : ComponentBase, IDisposable
     private ElementReference gameContainer;
     private System.Timers.Timer? gameTimer;
 
+    // Game options
+    private GameType selectedGameType = GameType.TypeA;
+    private SpeedSetting selectedSpeed = SpeedSetting.Medium;
+    private int selectedVirusLevel = 5;
+
     protected override void OnInitialized()
     {
         PlagueService.OnStateChanged += StateHasChanged;
@@ -44,7 +49,14 @@ public partial class PlagueDoctor : ComponentBase, IDisposable
 
     private void StartGame()
     {
-        PlagueService.StartNewGame(0);
+        if (selectedGameType == GameType.TypeA)
+        {
+            PlagueService.StartNewGame(0);
+        }
+        else
+        {
+            PlagueService.StartTypeBGame(selectedSpeed, selectedVirusLevel);
+        }
         StartGameLoop();
         _ = FocusGameContainer();
     }
@@ -216,9 +228,17 @@ public partial class PlagueDoctor : ComponentBase, IDisposable
 
     private string GetColorClass(PillColor color) => color switch
     {
-        PillColor.Red => "color-red",
-        PillColor.Blue => "color-blue",
-        PillColor.Yellow => "color-yellow",
+        PillColor.Orange => "color-orange",
+        PillColor.Lavender => "color-lavender",
+        PillColor.Mint => "color-mint",
+        _ => ""
+    };
+
+    private string GetVirusImage(PillColor color) => color switch
+    {
+        PillColor.Orange => "_content/GameBox/images/plague_doctor/orange_virus.png",
+        PillColor.Lavender => "_content/GameBox/images/plague_doctor/purple_virus.png",
+        PillColor.Mint => "_content/GameBox/images/plague_doctor/green_virus.png",
         _ => ""
     };
 

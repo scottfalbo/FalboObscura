@@ -28,6 +28,7 @@ public class PlagueService
 
     public void StartNewGame(int level = 0)
     {
+        State.Type = GameType.TypeA;
         Board.Clear();
         State.Reset(level);
         PlaceViruses();
@@ -38,8 +39,29 @@ public class PlagueService
         NotifyStateChanged();
     }
 
+    public void StartTypeBGame(SpeedSetting speed, int virusLevel)
+    {
+        State.Type = GameType.TypeB;
+        State.SelectedSpeed = speed;
+        State.SelectedVirusLevel = virusLevel;
+        Board.Clear();
+        State.Reset(0);
+        PlaceViruses();
+        State.VirusesRemaining = Board.CountViruses();
+        SpawnNextPill();
+        SpawnNextPill();
+        State.StartLevel();
+        NotifyStateChanged();
+    }
+
     public void StartNextLevel()
     {
+        // Type B doesn't have next level - game ends on victory
+        if (State.Type == GameType.TypeB)
+        {
+            return;
+        }
+        
         Board.Clear();
         State.Level++;
         State.Status = GameStatus.NotStarted;

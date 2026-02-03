@@ -5,27 +5,108 @@
     <div class="game-header">
         <div class="score-display">
             <span>Score: @PlagueService.State.Score</span>
-            <span>Level: @PlagueService.State.Level</span>
+            @if (PlagueService.State.Type == GameType.TypeA)
+            {
+                <span>Level: @PlagueService.State.Level</span>
+            }
             <span>Viruses: @PlagueService.State.VirusesRemaining</span>
         </div>
-        @if (PlagueService.CurrentPill != null)
-        {
-            <div style="background: black; color: lime; padding: 5px; margin-top: 5px;">
-                DEBUG: @PlagueService.CurrentPill.Orientation - Anchor:@PlagueService.CurrentPill.AnchorColor / Second:@PlagueService.CurrentPill.SecondColor
-            </div>
-        }
     </div>
 
     <div class="game-area">
-        <div class="next-pill-preview">
-            <h4>Next</h4>
-            @if (PlagueService.NextPill != null)
-            {
-                <div class="preview-pill">
-                    <div class="pill-half @GetColorClass(PlagueService.NextPill.Color1)"></div>
-                    <div class="pill-half @GetColorClass(PlagueService.NextPill.Color2)"></div>
-                </div>
-            }
+        <div class="side-panel">
+            <div class="next-pill-preview">
+                <h4>Next</h4>
+                @if (PlagueService.NextPill != null)
+                {
+                    <div class="preview-pill">
+                        <div class="pill-half @GetColorClass(PlagueService.NextPill.Color1)"></div>
+                        <div class="pill-half @GetColorClass(PlagueService.NextPill.Color2)"></div>
+                    </div>
+                }
+            </div>
+
+            <div class="side-image">
+                <img src="_content/GameBox/images/plague_doctor/plague_doctor.png" alt="Plague Doctor" />
+            </div>
+
+            <div class="game-controls">
+                @if (PlagueService.State.Status == GameStatus.NotStarted)
+                {
+                    <div class="game-options">
+                        <div class="option-group">
+                            <label>Game Type</label>
+                            <div class="option-buttons">
+                                <button class="option-btn @(selectedGameType == GameType.TypeA ? "active" : "")" 
+                                        @onclick="() => selectedGameType = GameType.TypeA">A</button>
+                                <button class="option-btn @(selectedGameType == GameType.TypeB ? "active" : "")" 
+                                        @onclick="() => selectedGameType = GameType.TypeB">B</button>
+                            </div>
+                        </div>
+
+                        @if (selectedGameType == GameType.TypeB)
+                        {
+                            <div class="option-group">
+                                <label>Speed</label>
+                                <div class="option-buttons">
+                                    <button class="option-btn @(selectedSpeed == SpeedSetting.Low ? "active" : "")" 
+                                            @onclick="() => selectedSpeed = SpeedSetting.Low">Low</button>
+                                    <button class="option-btn @(selectedSpeed == SpeedSetting.Medium ? "active" : "")" 
+                                            @onclick="() => selectedSpeed = SpeedSetting.Medium">Med</button>
+                                    <button class="option-btn @(selectedSpeed == SpeedSetting.High ? "active" : "")" 
+                                            @onclick="() => selectedSpeed = SpeedSetting.High">Hi</button>
+                                </div>
+                            </div>
+
+                            <div class="option-group">
+                                <label>Viruses: @((selectedVirusLevel + 1) * 4)</label>
+                                <input type="range" min="0" max="20" @bind="selectedVirusLevel" @bind:event="oninput" />
+                            </div>
+                        }
+                    </div>
+                    <button class="game-btn" @onclick="StartGame">Start Game</button>
+                }
+                else if (PlagueService.State.Status == GameStatus.GameOver)
+                {
+                    <div class="game-over">
+                        <h3>Game Over!</h3>
+                        <p>Final Score: @PlagueService.State.Score</p>
+                        <button class="game-btn" @onclick="StartGame">Play Again</button>
+                    </div>
+                }
+                else if (PlagueService.State.Status == GameStatus.Victory)
+                {
+                    <div class="victory">
+                        @if (PlagueService.State.Type == GameType.TypeA)
+                        {
+                            <h3>Level Complete!</h3>
+                            <button class="game-btn" @onclick="NextLevel">Next Level</button>
+                        }
+                        else
+                        {
+                            <h3>You Win!</h3>
+                            <p>Final Score: @PlagueService.State.Score</p>
+                            <button class="game-btn" @onclick="StartGame">Play Again</button>
+                        }
+                    </div>
+                }
+                else if (PlagueService.State.Status == GameStatus.Paused)
+                {
+                    <button class="game-btn" @onclick="ResumeGame">Resume</button>
+                }
+                else
+                {
+                    <button class="game-btn" @onclick="PauseGame">Pause</button>
+                }
+            </div>
+
+            <div class="controls-help">
+                <p>← → Move</p>
+                <p>↓ Drop</p>
+                <p>Z/X Rotate</p>
+                <p>Space Hard Drop</p>
+                <p>P Pause</p>
+            </div>
         </div>
 
         <div class="bottle-container" tabindex="0" @onkeydown="HandleKeyDown" @ref="gameContainer">
@@ -40,48 +121,14 @@
                         var isCurrentPill = IsCurrentPillPosition(r, c);
 
                         <div class="cell @GetCellClasses(cell, r, c, isCurrentPill)">
-                            @if (cell.IsVirus)
+                            @if (cell.IsVirus && cell.Color.HasValue)
                             {
-                                <span class="virus-face">☣</span>
+                                <img src="@GetVirusImage(cell.Color.Value)" class="virus-img" />
                             }
                         </div>
                     }
                 }
             </div>
         </div>
-    </div>
-
-    <div class="game-controls">
-        @if (PlagueService.State.Status == GameStatus.NotStarted)
-        {
-            <button class="game-btn" @onclick="StartGame">Start Game</button>
-        }
-        else if (PlagueService.State.Status == GameStatus.GameOver)
-        {
-            <div class="game-over">
-                <h3>Game Over!</h3>
-                <p>Final Score: @PlagueService.State.Score</p>
-                <button class="game-btn" @onclick="StartGame">Play Again</button>
-            </div>
-        }
-        else if (PlagueService.State.Status == GameStatus.Victory)
-        {
-            <div class="victory">
-                <h3>Level Complete!</h3>
-                <button class="game-btn" @onclick="NextLevel">Next Level</button>
-            </div>
-        }
-        else if (PlagueService.State.Status == GameStatus.Paused)
-        {
-            <button class="game-btn" @onclick="ResumeGame">Resume</button>
-        }
-        else
-        {
-            <button class="game-btn" @onclick="PauseGame">Pause</button>
-        }
-    </div>
-
-    <div class="controls-help">
-        <p>← → Move | ↓ Drop | Z/X Rotate | Space Hard Drop | P Pause</p>
     </div>
 </div>

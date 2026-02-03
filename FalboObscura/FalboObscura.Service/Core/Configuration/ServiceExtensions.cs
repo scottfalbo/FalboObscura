@@ -99,6 +99,7 @@ public static class ServiceExtensions
 
         // Register GameBox services
         builder.Services.AddScoped<GameBox.BlockGame.Data.GameService>();
+        builder.Services.AddScoped<GameBox.BlockGame.Data.LoadImageService>();
         builder.Services.AddScoped<GameBox.PlagueDoctor.Data.PlagueService>();
     }
 }

@@ -2,41 +2,49 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 0;
     font-family: 'Segoe UI', sans-serif;
     color: #fff;
-    /* Fixed minimum height to prevent layout shift */
-    min-height: 700px;
+    height: 100%;
+    width: 100%;
 }
 
 .game-header {
-    margin-bottom: 20px;
-    min-height: 60px;  /* Reserve space for debug text */
+    margin-bottom: 0.5vh;
 }
 
 .score-display {
     display: flex;
-    gap: 30px;
-    font-size: 1.2rem;
+    gap: 3vw;
+    font-size: clamp(1rem, 2vh, 1.5rem);
     font-weight: bold;
 }
 
 .game-area {
     display: flex;
-    gap: 30px;
+    gap: 1.5vw;
     align-items: flex-start;
+    flex: 1;
+}
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vh;
 }
 
 .next-pill-preview {
     background: #2a2a4a;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 1vh;
+    border-radius: 10px;
     text-align: center;
+    width: fit-content;
 }
 
 .next-pill-preview h4 {
-    margin: 0 0 10px 0;
-    font-size: 0.9rem;
+    margin: 0 0 0.5vh 0;
+    font-size: clamp(0.7rem, 1.2vh, 0.9rem);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -48,16 +56,31 @@
 }
 
 .preview-pill .pill-half {
-    width: 24px;
-    height: 24px;
+    width: clamp(16px, 2.5vh, 28px);
+    height: clamp(16px, 2.5vh, 28px);
     border-radius: 50%;
+}
+
+.side-image {
+    background: #2a2a4a;
+    padding: 1vh;
+    border-radius: 10px;
+    width: clamp(150px, 24vh, 250px);
+    height: clamp(150px, 24vh, 250px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.side-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
 }
 
 .bottle-container {
     outline: none;
-    /* Fixed dimensions to prevent layout shift during gravity */
-    min-height: 560px;  /* 16 rows * 32px + padding + border + bottle neck */
-    margin-top: 25px;   /* Space for bottle neck */
 }
 
 .bottle-container:focus {
@@ -68,37 +91,34 @@
 
 .bottle {
     display: grid;
-    grid-template-columns: repeat(8, 32px);
-    grid-template-rows: repeat(16, 32px);
+    grid-template-columns: repeat(8, clamp(34px, 5.4vh, 60px));
+    grid-template-rows: repeat(16, clamp(34px, 5.4vh, 60px));
     gap: 1px;
     background: #1a1a2e;
-    border: 4px solid #4a4a6a;
-    border-radius: 0 0 12px 12px;
+    border: clamp(3px, 0.6vh, 7px) solid #4a4a6a;
+    border-radius: 0 0 14px 14px;
     padding: 2px;
     position: relative;
-    /* Fixed dimensions */
-    width: calc(8 * 32px + 7 * 1px + 4px);  /* cells + gaps + padding */
-    height: calc(16 * 32px + 15 * 1px + 4px);
 }
 
 /* Bottle neck effect */
 .bottle::before {
     content: '';
     position: absolute;
-    top: -20px;
+    top: clamp(-22px, -3vh, -36px);
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 20px;
+    width: clamp(72px, 12vh, 144px);
+    height: clamp(22px, 3vh, 36px);
     background: #1a1a2e;
-    border: 4px solid #4a4a6a;
+    border: clamp(3px, 0.6vh, 7px) solid #4a4a6a;
     border-bottom: none;
-    border-radius: 8px 8px 0 0;
+    border-radius: 10px 10px 0 0;
 }
 
 .cell {
-    width: 32px;
-    height: 32px;
+    width: clamp(34px, 5.4vh, 60px);
+    height: clamp(34px, 5.4vh, 60px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -107,29 +127,38 @@
 }
 
 /* Colors */
-.color-red {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a5a) !important;
-    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 107, 107, 0.4);
+.color-orange {
+    background: linear-gradient(135deg, #ff9f43, #ee8530) !important;
+    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 159, 67, 0.4);
 }
 
-.color-blue {
-    background: linear-gradient(135deg, #4dabf7, #339af0) !important;
-    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(77, 171, 247, 0.4);
+.color-lavender {
+    background: linear-gradient(135deg, #a29bfe, #8c7ae6) !important;
+    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(162, 155, 254, 0.4);
 }
 
-.color-yellow {
-    background: linear-gradient(135deg, #ffd43b, #fab005) !important;
-    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 212, 59, 0.4);
+.color-mint {
+    background: linear-gradient(135deg, #55efc4, #00b894) !important;
+    box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(85, 239, 196, 0.4);
 }
 
 /* Virus styling */
 .virus {
     border-radius: 6px !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
-.virus-face {
-    font-size: 18px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+.virus-img {
+    width: clamp(29px, 4.8vh, 54px);
+    height: clamp(29px, 4.8vh, 54px);
+    object-fit: contain;
+    animation: virus-wiggle 1.2s ease-in-out infinite;
+}
+
+@keyframes virus-wiggle {
+    0%, 100% { transform: rotate(-2deg); }
+    50% { transform: rotate(2deg); }
 }
 
 /* Pill styling */
@@ -156,15 +185,17 @@
 
 /* Game controls */
 .game-controls {
-    margin-top: 20px;
+    margin-top: 1vh;
+    text-align: center;
+    width: 100%;
 }
 
 .game-btn {
     background: linear-gradient(135deg, #6366f1, #4f46e5);
     color: white;
     border: none;
-    padding: 12px 30px;
-    font-size: 1.1rem;
+    padding: clamp(8px, 1.2vh, 14px) clamp(16px, 2vw, 30px);
+    font-size: clamp(0.85rem, 1.5vh, 1.1rem);
     font-weight: bold;
     border-radius: 8px;
     cursor: pointer;
@@ -187,20 +218,109 @@
 
 .game-over h3 {
     color: #ff6b6b;
-    margin-bottom: 10px;
+    margin-bottom: 1vh;
 }
 
 .victory h3 {
     color: #51cf66;
-    margin-bottom: 10px;
+    margin-bottom: 1vh;
+}
+
+/* Game Options */
+.game-options {
+    background: #2a2a4a;
+    padding: 1vh;
+    border-radius: 8px;
+    margin-bottom: 1vh;
+    width: 100%;
+}
+
+.option-group {
+    margin-bottom: 0.8vh;
+}
+
+.option-group:last-child {
+    margin-bottom: 0;
+}
+
+.option-group label {
+    display: block;
+    font-size: clamp(0.65rem, 1vh, 0.8rem);
+    color: #aaa;
+    margin-bottom: 0.3vh;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.option-buttons {
+    display: flex;
+    gap: 0.5vh;
+}
+
+.option-btn {
+    flex: 1;
+    padding: clamp(4px, 0.6vh, 8px) clamp(8px, 1vh, 12px);
+    font-size: clamp(0.7rem, 1vh, 0.85rem);
+    font-weight: bold;
+    border: 2px solid #4a4a6a;
+    background: transparent;
+    color: #888;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.option-btn:hover {
+    border-color: #6366f1;
+    color: #fff;
+}
+
+.option-btn.active {
+    background: #6366f1;
+    border-color: #6366f1;
+    color: #fff;
+}
+
+.option-group input[type="range"] {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #4a4a6a;
+    border-radius: 3px;
+    outline: none;
+}
+
+.option-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #6366f1;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.option-group input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #6366f1;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
 }
 
 .controls-help {
-    margin-top: 20px;
-    font-size: 0.85rem;
+    margin-top: 1vh;
+    font-size: clamp(0.7rem, 1.2vh, 0.9rem);
     color: #888;
+    text-align: center;
+    background: #2a2a4a;
+    padding: 1vh;
+    border-radius: 8px;
+    width: 100%;
 }
 
 .controls-help p {
-    margin: 0;
+    margin: 0.3vh 0;
 }
